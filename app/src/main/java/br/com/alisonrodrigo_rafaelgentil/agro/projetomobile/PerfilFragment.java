@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -183,7 +184,7 @@ public class PerfilFragment extends Fragment {
         String resultado;
 //        resultado = clienteDao.insertUsuario(usuario);
 
-
+//        FirebaseApp.initializeApp(this);
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -220,27 +221,10 @@ public class PerfilFragment extends Fragment {
                                 String uid = FirebaseAuth.getInstance().getUid();
                                 String fotoFileURL = uri.toString();
 
-                                usuario = new Usuario();
-                                usuario.setNome(nomeText.getText().toString());
-                                usuario.setCpf(cpfText.getText().toString());
-                                usuario.setEmail(emailText.getText().toString());
-                                usuario.setTelefone(telefText.getText().toString());
-                                usuario.setDataNascimento(data_nascText.getText().toString());
-                                usuario.setLogin(loginText.getText().toString());
-                                usuario.setSenha(senhaText.getText().toString());
+                                usuario.setFotoFileURL(fotoFileURL);
+                                Log.i("TesteFoto", fotoFileURL);
+                                salvaralgumas();
 
-                                FirebaseFirestore.getInstance().collection("user").add(usuario)
-                                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                            @Override
-                                            public void onSuccess(DocumentReference documentReference) {
-                                                Log.i("Teste", documentReference.getId());
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.i("Teste", e.getMessage());
-                                    }
-                                });
                             }
                         });
                     }
@@ -253,6 +237,22 @@ public class PerfilFragment extends Fragment {
         });
 
     }
+
+    private void salvaralgumas() {
+        FirebaseFirestore.getInstance().collection("user").add(usuario)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.i("TesteUser", documentReference.getId());
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i("Teste", e.getMessage());
+            }
+        });
+    }
+
 
     private void atualizar(){
         usuario.setNome(nomeText.getText().toString());

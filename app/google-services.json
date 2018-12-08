@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "79144712082",
+    "firebase_url": "https://agromobile-alison-rafael.firebaseio.com",
+    "project_id": "agromobile-alison-rafael",
+    "storage_bucket": "agromobile-alison-rafael.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79144712082:android:c378efa688551b5c",
+        "android_client_info": {
+          "package_name": "br.com.alisonrodrigo_rafaelgentil.agro.projetomobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "79144712082-la1djv9il3o1hc0al9u0rnjn857u6lp3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDdOXw41oKRgGdPP6-erK7vBkmh8ngAPE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
