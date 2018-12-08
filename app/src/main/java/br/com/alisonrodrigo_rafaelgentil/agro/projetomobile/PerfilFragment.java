@@ -192,7 +192,7 @@ public class PerfilFragment extends Fragment {
                         if(task.isSuccessful()){
                             Log.i("Teste", task.getResult().getUser().getUid());
                             clienteDao.insertUsuario(usuario);
-                            salvarUser();
+                            salvarFoto();
                         }
                     }
                 })
@@ -208,7 +208,7 @@ public class PerfilFragment extends Fragment {
 
     }
 
-    private void salvarUser() {
+    private void salvarFoto() {
         String fileName = UUID.randomUUID().toString();
         final StorageReference ref = FirebaseStorage.getInstance().getReference("/images/" + fileName);
         ref.putFile(mSelectUri)
@@ -223,7 +223,7 @@ public class PerfilFragment extends Fragment {
 
                                 usuario.setFotoFileURL(fotoFileURL);
                                 Log.i("TesteFoto", fotoFileURL);
-                                salvaralgumas();
+                                salvarUser();
 
                             }
                         });
@@ -238,7 +238,7 @@ public class PerfilFragment extends Fragment {
 
     }
 
-    private void salvaralgumas() {
+    private void salvarUser() {
         FirebaseFirestore.getInstance().collection("user").add(usuario)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
