@@ -9,6 +9,13 @@
             android:title="Perfil"
             android:id="@+id/nav_perfil"/>
         <item
+            android:id="@+id/nav_sair"
+            android:orderInCategory="100"
+            android:title="Sair"
+            android:icon="@drawable/ic_menu_exit"/>
+            <!--app:showAsAction="never"-->
+
+        <item
             android:id="@+id/nav_publicacoes"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Publicações" />
@@ -30,5 +37,7 @@
                 android:title="Enviar" />
         </menu>
     </item>
+
+
 
 </menu>

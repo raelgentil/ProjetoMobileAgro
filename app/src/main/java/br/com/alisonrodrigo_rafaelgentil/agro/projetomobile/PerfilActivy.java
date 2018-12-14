@@ -1,9 +1,11 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.Usuario;
 
@@ -27,6 +32,7 @@ public class PerfilActivy extends AppCompatActivity
     private PerfilFragment perfilFragment;
     private TextView emailView;
     private PublicacoesFragment publicacaoFragment;
+//    private FirebaseUser user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +68,7 @@ public class PerfilActivy extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         TextView nomeHeader = (TextView) headerView.findViewById(R.id.text_nomeUser);
-        nomeHeader.setText(usuario.getNome().toString());
+//        nomeHeader.setText(usuario.getNome().toString());
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
     }
@@ -106,6 +112,7 @@ public class PerfilActivy extends AppCompatActivity
 
         }
 
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -135,10 +142,23 @@ public class PerfilActivy extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
+        else if (id == R.id.nav_sair) {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(PerfilActivy.this, MainActivity.class);
+            startActivity(intent);
+
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void voltarTelaLogin(){
+
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
+
     }
 
 

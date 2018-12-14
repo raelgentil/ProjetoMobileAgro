@@ -5,7 +5,7 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <!--<uses-sdk android:targetSdkVersion="28" />-->
+    <!-- <uses-sdk android:targetSdkVersion="28" /> -->
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,6 +19,11 @@
 
     <uses-permission android:name="br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.permission.C2D_MESSAGE" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:appComponentFactory="android.support.v4.app.CoreComponentFactory"
@@ -29,7 +34,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="HardcodedDebugMode">
-        <activity android:name=".MainActivity" >
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,10 +42,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="CadastroActivity"
+            android:name=".CadastroActivity"
             android:label="@string/title_activity_cadastro_activy" />
         <activity
-            android:name="PerfilActivy"
+            android:name=".PerfilActivy"
             android:label="@string/title_activity_perfil_activy"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -51,7 +56,7 @@
             android:permission="com.google.firebase.auth.api.gms.permission.LAUNCH_FEDERATED_SIGN_IN"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <service android:name="com.google.firebase.components.ComponentDiscoveryService" >
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService">
             <meta-data
                 android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
@@ -66,13 +71,12 @@
         <receiver
             android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
             android:enabled="true"
-            android:exported="false" >
-        </receiver>
+            android:exported="false"></receiver>
         <receiver
             android:name="com.google.android.gms.measurement.AppMeasurementInstallReferrerReceiver"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.INSTALL_PACKAGES" >
+            android:permission="android.permission.INSTALL_PACKAGES">
             <intent-filter>
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
@@ -91,7 +95,7 @@
         <receiver
             android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
@@ -104,8 +108,8 @@
         -->
         <service
             android:name="com.google.firebase.iid.FirebaseInstanceIdService"
-            android:exported="true" >
-            <intent-filter android:priority="-500" >
+            android:exported="true">
+            <intent-filter android:priority="-500">
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
@@ -124,6 +128,10 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"></activity>
     </application>
 
 </manifest>
