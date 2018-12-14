@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements ComunicadorInterf
 //        clienteDao = new ClienteDao(getBaseContext());
 //        usuario = clienteDao.verificarLogin(usuario.getLogin(), usuario.getSenha());
 //        mDatabase.child("users").child(userId).child("username").setValue(name);
-        usuario = new Usuario();
+//        usuario = new Usuario();
         Bundle args = null;
         if(usuario != null){
 //            FirebaseFirestore.getInstance().collection("user").add(usuario)

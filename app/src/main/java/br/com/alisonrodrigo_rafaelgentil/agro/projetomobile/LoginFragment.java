@@ -33,8 +33,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+
+import com.google.firebase.firestore.Query;
+//import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.Usuario;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
@@ -49,6 +56,7 @@ public class LoginFragment extends Fragment {
     private Button okButton;
     PerfilFragment perfilFragment;
     ComunicadorInterface comunicadorInterface;
+    private  Usuario usuario;
 
 
 //    private UserLogin userLogin = null;
@@ -184,7 +192,7 @@ public class LoginFragment extends Fragment {
             // perform the user login attempt.
             showProgress(true);
             if(isNewUser) {
-                FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, senha).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                mAuth.createUserWithEmailAndPassword(email, senha).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         showProgress(false);
@@ -213,18 +221,64 @@ public class LoginFragment extends Fragment {
             else {
 //                userLogin = new UserLogin(email, senha);
 //                userLogin.execute((Void) null);
-                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, senha)
+                mAuth.signInWithEmailAndPassword(email, senha)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
                                     Log.i("TesteAutenticado", task.getResult().getUser().getUid());
-                                    Usuario usuario = new Usuario();
-                                    usuario.setLogin(loginText.getText().toString());
-                                    usuario.setSenha(senhaText.getText().toString());
-                                    Bundle bundle = new Bundle();
-                                    bundle.putSerializable("usuario", usuario);
-                                    comunicadorInterface.responde(bundle);
+                                    DatabaseReference raiz = FirebaseDatabase.getInstance().getReference();
+//                                    DatabaseReference raiz = mAuth.getUid()
+
+                                    Query querry1 = FirebaseFirestore.getInstance().collection("user").whereEqualTo("email", loginText.getText().toString());
+                                            querry1.get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
+
+                                                            usuario = new Usuario(document.getId(), document.get("nome").toString(), document.get("cpf").toString(),
+                                                                    document.get("email").toString(), document.get("telefone").toString(), document.get("login").toString(),
+                                                                    document.get("senha").toString(), document.get("dataNascimento").toString(), document.get("fotoFileURL").toString());
+                                                            Bundle bundle = new Bundle();
+                                                            bundle.putSerializable("usuario", usuario);
+                                                            comunicadorInterface.responde(bundle);
+                                                            Log.i("TesteDeuCertoPegarDados", usuario.toString());
+
+
+                                                        }
+                                                    }
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.i("TesteFalhaPegarDados", e.getMessage());
+//                                                        Log.w(TAG, "Error getting documents.", task.getException());
+                                                }
+                                            });
+
+//                                    Query query2 = raiz.child("user").orderByChild("email").equalTo(loginText.getText().toString());
+//                                    query2.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                        @Override
+//                                        public void onDataChange(DataSnapshot dataSnapshot) {
+//
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onCancelled(DatabaseError databaseError) {
+//
+//                                        }
+//                                    });
+
+//                                    Usuario usuario = new Usuario();
+//                                    usuario.setLogin(loginText.getText().toString());
+//                                    usuario.setSenha(senhaText.getText().toString());
+//                                    Bundle bundle = new Bundle();
+//                                    bundle.putSerializable("usuario", usuario);
+//                                    comunicadorInterface.responde(bundle);
                                 }
                             }
                         })
@@ -234,9 +288,18 @@ public class LoginFragment extends Fragment {
                                 Log.i("TesteFalhaAoAutenticar", e.getMessage());
                             }
                         });
+//                Bundle bundle = new Bundle();
+//                bundle.putSerializable("usuario", usuario);
+//                comunicadorInterface.responde(bundle);
+//                Log.i("TesteDeuCerto", usuario.toString());
             }
         }
     }
+//    private void writeNewUser(String name, String email) {
+//        User user = new User(name, email);
+//
+//        mDatabase.child("users").child(userId).setValue(user);
+//    }
 //
 //    public class UserLogin extends AsyncTask<Void, Void, Boolean> {
 //
