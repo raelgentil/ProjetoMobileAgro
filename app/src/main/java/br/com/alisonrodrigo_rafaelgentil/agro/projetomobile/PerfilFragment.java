@@ -32,6 +32,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -300,6 +301,9 @@ public class PerfilFragment extends Fragment {
             if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
                 abilitarDesabilitarCampos(false);
             }
+            selectImgButton.setAlpha(0);
+//            Picasso.with(v.getContext()).load(txtUrl.getText().toString()).into(imvImagem);
+            Picasso.get().load(usuario.getFotoFileURL()).into(fotoImgView);
             nomeText.setText(usuario.getNome());
             cpfText.setText(usuario.getCpf());
             emailText.setText(usuario.getEmail());
@@ -307,6 +311,7 @@ public class PerfilFragment extends Fragment {
             data_nascText.setText(usuario.getDataNascimento());
             loginText.setText(usuario.getLogin());
             senhaText.setText(usuario.getSenha());
+
         }
 
     }
