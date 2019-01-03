@@ -3,11 +3,8 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,32 +21,33 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.UUID;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.ClienteDao;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.Usuario;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Observer;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PerfilFragment extends Fragment {
+public class PerfilFragment extends Fragment implements Observer {
 
-    private ClienteDao clienteDao;
-
-    private Usuario usuario;
+    private Pessoa pessoa;
     private EditText nomeText;
     private EditText cpfText;
     private EditText emailText;
@@ -90,15 +88,16 @@ public class PerfilFragment extends Fragment {
         fotoImgView = (CircleImageView)view.findViewById(R.id.fotoImgView);
         okButton.setText(nomeButton);
 
+
         cpfText.addTextChangedListener(MaskEditUtil.mask(cpfText,MaskEditUtil.FORMAT_CPF));
         data_nascText.addTextChangedListener(MaskEditUtil.mask(data_nascText, MaskEditUtil.FORMAT_DATE));
         telefText.addTextChangedListener(MaskEditUtil.mask(telefText, MaskEditUtil.FORMAT_FONE));
-
-
-        atualizarCampos();
-
-        clienteDao = new ClienteDao(view.getContext());
-
+//        atualizarCampos();
+        Bundle args = getArguments();
+        okButton.setText((String)args.getSerializable("nomeButton"));
+        pessoa = (Pessoa) args.getSerializable("pessoa");
+        pessoa.addObserver(this);
+        update(pessoa);
 
         selectImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,7 +113,7 @@ public class PerfilFragment extends Fragment {
                     voltarTelaLogin();
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.ATUALIZAR)){
-                    abilitarDesabilitarCampos(false);
+                    abilitarCampos(false);
                     okButton.setText(MaskEditUtil.EDITAR);
                 }
 
@@ -133,14 +132,12 @@ public class PerfilFragment extends Fragment {
                     atualizar();
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
-                    abilitarDesabilitarCampos(true);
+                    abilitarCampos(true);
                     okButton.setText(MaskEditUtil.ATUALIZAR);
                 }
 
             }
         });
-
-
         return view;
     }
 
@@ -148,52 +145,43 @@ public class PerfilFragment extends Fragment {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(intent, 0);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), 0);
-
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0){
+        if (requestCode == 0 && data != null){
             mSelectUri = data.getData();
-            Bitmap bitmap = null;
-
-            try {
-               bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), mSelectUri);
-               fotoImgView.setImageDrawable(new BitmapDrawable(bitmap));
-               selectImgButton.setAlpha(0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            selectImgButton.setAlpha(0);
+            Picasso.get().load(mSelectUri).resize(350, 350).centerCrop().into(fotoImgView);
         }
     }
 
     private void salvar(){
-
-
-        usuario = new Usuario();
-        usuario.setNome(nomeText.getText().toString());
-        usuario.setCpf(cpfText.getText().toString());
-        usuario.setEmail(emailText.getText().toString());
-        usuario.setTelefone(telefText.getText().toString());
-        usuario.setDataNascimento(data_nascText.getText().toString());
-        usuario.setLogin(loginText.getText().toString());
-        usuario.setSenha(senhaText.getText().toString());
-
-        String resultado;
-//        resultado = clienteDao.insertUsuario(usuario);
-
-//        FirebaseApp.initializeApp(this);
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
+        pessoa = pegarDadosTela();
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(pessoa.getEmail(), pessoa.getSenha())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             Log.i("Teste", task.getResult().getUser().getUid());
-                            clienteDao.insertUsuario(usuario);
+                            pessoa.setUId(task.getResult().getUser().getUid());
                             salvarFoto();
+                        }else{
+                            String erroException="";
+                            try {
+                                throw task.getException();
+                            } catch (FirebaseAuthWeakPasswordException e) {
+                                erroException = "Digite uma senha mais forte, contendo no minimo 8 caracter";
+                            }catch (FirebaseAuthInvalidCredentialsException e) {
+                                erroException = "O e-mail digitado é invalido, digite outro e-mail";
+                            }catch (FirebaseAuthUserCollisionException e) {
+                                erroException = "Esse e-mail ja foi cadastrado no sistema, digite outro e-mail";
+                            }catch (Exception e) {
+                                erroException = "Erro ao Cadastrar Usuario" ;
+                            }
+                            Toast.makeText(getContext().getApplicationContext(), "Erro: " + erroException, Toast.LENGTH_LONG).show();
                         }
                     }
                 })
@@ -203,9 +191,6 @@ public class PerfilFragment extends Fragment {
                         Log.i("Teste", e.getMessage());
                     }
                 });
-
-        Toast.makeText(getContext(),"Usuário salvo com sucesso!", Toast.LENGTH_LONG).show();
-//        Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG).show();
 
     }
 
@@ -222,10 +207,9 @@ public class PerfilFragment extends Fragment {
                                 String uid = FirebaseAuth.getInstance().getUid();
                                 String fotoFileURL = uri.toString();
 
-                                usuario.setFotoFileURL(fotoFileURL);
+                                pessoa.setFotoFileURL(fotoFileURL);
                                 Log.i("TesteFoto", fotoFileURL);
-                                salvarUser();
-
+                                salvarPessoa();
                             }
                         });
                     }
@@ -236,44 +220,59 @@ public class PerfilFragment extends Fragment {
                     Log.i("Teste", e.getMessage(), e);
             }
         });
-
     }
 
-    private void salvarUser() {
-        FirebaseFirestore.getInstance().collection("user").add(usuario)
+    private void salvarPessoa() {
+        FirebaseFirestore.getInstance().collection("pessoa").add(pessoa.getMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.i("TesteUser", documentReference.getId());
+                        Toast.makeText(getContext(),"Usuário salvo com sucesso!", Toast.LENGTH_LONG).show();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i("Teste", e.getMessage());
+                Toast.makeText(getContext(),"Erro ao salvar Usuario!", Toast.LENGTH_LONG).show();
             }
         });
     }
 
-
     private void atualizar(){
-        usuario.setNome(nomeText.getText().toString());
-        usuario.setCpf(cpfText.getText().toString());
-        usuario.setEmail(emailText.getText().toString());
-        usuario.setTelefone(telefText.getText().toString());
-        usuario.setDataNascimento(data_nascText.getText().toString());
-        usuario.setLogin(loginText.getText().toString());
-        usuario.setSenha(senhaText.getText().toString());
+        pegarDadosTela();
+        FirebaseFirestore.getInstance().collection("user").document(pessoa.getUId()).set(pessoa.getMap());
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        currentUser.updateEmail(pessoa.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getContext(),"Usuario atualizado com sucesso!", Toast.LENGTH_LONG).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(),"Erro ao atualizar Usuario!", Toast.LENGTH_LONG).show();
+            }
+        });
+        currentUser.updatePassword(pessoa.getSenha());
 
 
-        if(clienteDao.updateUsuario(usuario)){
+    }
 
-            Toast.makeText(getContext(),"Usuário alterado com sucesso!", Toast.LENGTH_LONG).show();
-
-        }
+    private Pessoa pegarDadosTela(){
+//        Pessoa pessoa = this.pessoa;
+        pessoa.setNome(nomeText.getText().toString());
+        pessoa.setCpf(cpfText.getText().toString());
+        pessoa.setEmail(emailText.getText().toString());
+        pessoa.setTelefone(telefText.getText().toString());
+        pessoa.setDataNascimento(data_nascText.getText().toString());
+        pessoa.setLogin(loginText.getText().toString());
+        pessoa.setSenha(senhaText.getText().toString());
+        return pessoa;
     }
 
 
-    public void abilitarDesabilitarCampos(boolean ativar){
+    private void abilitarCampos(boolean ativar){
         nomeText.setEnabled(ativar);
         cpfText.setEnabled(ativar);
         emailText.setEnabled(ativar);
@@ -281,46 +280,39 @@ public class PerfilFragment extends Fragment {
         data_nascText.setEnabled(ativar);
         loginText.setEnabled(ativar);
         senhaText.setEnabled(ativar);
+        selectImgButton.setEnabled(ativar);
     }
-    public void voltarTelaLogin(){
+
+    private void voltarTelaLogin(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         LoginFragment loginFragment = new LoginFragment();
-//        loginFragment.setActivityListener(getActivity());
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         fragmentTransaction.replace (R.id.layoutMainPrincipal, loginFragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit ();
-
     }
 
-    public void setNomeButton(String nomeButton){
-        this.nomeButton = nomeButton;
-    }
-
-    public void atualizarCampos(){
-        if (usuario != null){
+    @Override
+    public void update(Object observado) {
+        pessoa = (Pessoa) observado;
+        if (pessoa != null){
             if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
-                abilitarDesabilitarCampos(false);
+                abilitarCampos(false);
             }
-            selectImgButton.setAlpha(0);
-//            Picasso.with(v.getContext()).load(txtUrl.getText().toString()).into(imvImagem);
-            Picasso.get().load(usuario.getFotoFileURL()).into(fotoImgView);
-            nomeText.setText(usuario.getNome());
-            cpfText.setText(usuario.getCpf());
-            emailText.setText(usuario.getEmail());
-            telefText.setText(usuario.getTelefone());
-            data_nascText.setText(usuario.getDataNascimento());
-            loginText.setText(usuario.getLogin());
-            senhaText.setText(usuario.getSenha());
+            nomeText.setText(pessoa.getNome());
+            cpfText.setText(pessoa.getCpf());
+            emailText.setText(pessoa.getEmail());
+            telefText.setText(pessoa.getTelefone());
+            data_nascText.setText(pessoa.getDataNascimento());
+            loginText.setText(pessoa.getLogin());
+            senhaText.setText(pessoa.getSenha());
+            if (pessoa.getFotoFileURL()==null){
+                selectImgButton.setAlpha(1);
+            }else{
 
+                selectImgButton.setAlpha(0);
+                Picasso.get().load(pessoa.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
+            }
         }
-
     }
-    public Usuario receberUsuario(Usuario usuario){
-
-        this.usuario= usuario;
-
-
-        return  this.usuario;
-    }
-
 }
