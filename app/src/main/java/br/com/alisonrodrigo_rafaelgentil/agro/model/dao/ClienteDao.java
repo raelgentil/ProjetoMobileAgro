@@ -27,7 +27,7 @@ public class ClienteDao {
 //        valores = new ContentValues();
 //        valores.put(criarBanco.Nome_usuario, usuario.getNome());
 //        valores.put(criarBanco.Cpf, usuario.getCpf());
-//        valores.put(criarBanco.Email, usuario.getEmail());
+//        valores.put(criarBanco.Email, usuario.getuId());
 //        valores.put(criarBanco.Telefone_Usuario, usuario.getTelefone());
 //        valores.put(criarBanco.Data_Nascimento_Usuario, usuario.getDataNascimento());
 //        valores.put(criarBanco.Nome_de_usuario, usuario.getLogin());
@@ -74,7 +74,7 @@ public class ClienteDao {
 //                user.setId(cursor.getInt(0));            // definição do ID retornado do cursor
 //                user.setNome(cursor.getString(1));       // definição do NOME retornado do cursor
 //                user.setCpf(cursor.getString(2));
-//                user.setEmail(cursor.getString(3));      // definição do EMAIL retornado do cursor
+//                user.setuId(cursor.getString(3));      // definição do EMAIL retornado do cursor
 //                user.setTelefone(cursor.getString(4));
 //                user.setDataNascimento(cursor.getString(5));
 //                user.setLogin(cursor.getString(6));
@@ -104,7 +104,7 @@ public class ClienteDao {
 //        ContentValues values = new ContentValues();
 //        values.put(criarBanco.Nome_usuario, usuario.getNome());
 //        values.put(criarBanco.Cpf,usuario.getCpf());
-//        values.put(criarBanco.Email, usuario.getEmail());
+//        values.put(criarBanco.Email, usuario.getuId());
 //        values.put(criarBanco.Telefone_Usuario, usuario.getTelefone());
 //        values.put(criarBanco.Data_Nascimento_Usuario, usuario.getDataNascimento());
 //        values.put(criarBanco.Nome_de_usuario, usuario.getLogin());
@@ -131,7 +131,7 @@ public class ClienteDao {
 //            usuario = new Usuario();
 //            usuario.setId(usuarioID);
 //            usuario.setNome(nome);
-//            usuario.setEmail(email);
+//            usuario.setuId(email);
 //        }
 //
 //        return usuario;

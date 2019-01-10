@@ -10,7 +10,7 @@
     <!-- TODO: Update blank fragment layout -->
 
     <TextView
-        android:id="@+id/nomeTView"
+        android:id="@+id/mensagemTView"
         android:layout_width="0dp"
         android:layout_height="25dp"
         android:layout_marginStart="8dp"
@@ -37,7 +37,7 @@
         android:background="@drawable/bg_edittext_roudend"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nomeTView" />
+        app:layout_constraintTop_toBottomOf="@+id/mensagemTView" />
 
     <TextView
         android:id="@+id/cpfTView"
@@ -271,18 +271,29 @@
         android:text="Foto"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/fotoImgView"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/selectImgButton"
         app:layout_constraintEnd_toEndOf="@+id/selectImgButton"
         app:layout_constraintStart_toStartOf="@+id/selectImgButton"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="@+id/selectImgButton" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

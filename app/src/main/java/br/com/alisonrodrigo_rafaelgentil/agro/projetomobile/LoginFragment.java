@@ -33,6 +33,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
@@ -41,7 +45,7 @@ import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.Comunicad
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements ComunicadorInterface{
 
     private TextView cadastroTView;
     private Button okButton;
@@ -53,9 +57,7 @@ public class LoginFragment extends Fragment {
     private FirebaseUser user;
     private FirebaseAuth mAuth;
 
-    public LoginFragment() {
-
-    }
+    public LoginFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -81,7 +83,12 @@ public class LoginFragment extends Fragment {
                 showProgress(true);
                 okButton.setEnabled(false);
                 cadastroTView.setEnabled(false);
-                autenticarUsuario(loginText.getText().toString(),senhaText.getText().toString());
+                Usuario u = new Usuario();
+                u.setEmail(loginText.getText().toString());
+                u.setSenha(senhaText.getText().toString());
+//                autenticarUsuario(u);
+                PessoaDAO pessoaDAO = new PessoaDAO();
+                pessoaDAO.autenticarUsuario(u, LoginFragment.this);
                 }
         });
         return view;
@@ -90,12 +97,12 @@ public class LoginFragment extends Fragment {
 
     public void abrirCadastro(View v){
         perfilFragment = new PerfilFragment();
-        Bundle args = args = new Bundle();
-        args.putSerializable("pessoa", new Pessoa());
-        args.putSerializable("nomeButton", MaskEditUtil.SALVAR);
+        Map<String, Object> map = new HashMap<>();
+        map.put("nomeButton", MaskEditUtil.SALVAR);
+        map.put("pessoa", new Pessoa());
+        perfilFragment.responde(map);
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-        perfilFragment.setArguments(args);
         fragmentTransaction.replace (R.id.layoutMainPrincipal, perfilFragment);
 //        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit ();
@@ -112,89 +119,85 @@ public class LoginFragment extends Fragment {
 
     }
 
-    public Pessoa autenticarUsuario(String email, String senha){
-        if (isEmailValid(email) && isSenhaValid(senha)){
-            final Pessoa pessoa = new Pessoa();
-            pessoa.setEmail(email);
-            pessoa.setSenha(senha);
-            Log.i("TesteAutenticado", "Vou entrar no autenticar:   "  + email + "    " + senha);
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, senha)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                Log.i("TesteAutenticado", task.getResult().getUser().getUid());
-
-                                Query querry1 = FirebaseFirestore.getInstance().collection("user").whereEqualTo("email", pessoa.getEmail());
-                                querry1.get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                                        Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
-                                                        pessoa.setUId(document.getId());
-                                                        pessoa.setNome((String) document.get("nome"));
-                                                        pessoa.setCpf((String) document.get("cpf"));
-                                                        pessoa.setEmail((String) document.get("email"));
-                                                        pessoa.setTelefone((String) document.get("telefone"));
-                                                        pessoa.setLogin((String) document.get("login"));
-                                                        pessoa.setSenha((String) document.get("senha"));
-                                                        pessoa.setDataNascimento((String) document.get("dataNascimento"));
-                                                        pessoa.setFotoFileURL((String) document.get("fotoFileURL"));
-
-                                                        Bundle bundle = new Bundle();
-                                                        bundle.putSerializable("pessoa", pessoa);
-                                                        comunicadorInterface.responde(bundle);
-                                                        Log.i("TesteDeuCerto", pessoa.getNome());
-                                                        showProgress(false);
-                                                        okButton.setEnabled(true);
-                                                        cadastroTView.setEnabled(true);
-
-                                                    }
-                                                }
-                                            }
-                                        }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.i("TesteFalhaPegarDados", e.getMessage());
-//                                                        Log.w(TAG, "Error getting documents.", task.getException());
-                                    }
-                                });
-
-                            }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        String mensagem = "Erro: ";
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            showProgress(false);
-                            okButton.setEnabled(true);
-                            cadastroTView.setEnabled(true);
-                            e.printStackTrace();
-                            if(e.getMessage().equals("The email address is badly formatted.")){
-                                mensagem += "O e-mail digitado é invalido, digite um e-mail valido";
-                            }
-                            if(e.getMessage().equals("There is no user record corresponding to this identifier. The user may have been deleted.") || e.getMessage().equals("The password is invalid or the user does not have a password.")){
-                                mensagem += "E-mail ou senha incorreto";
-                            }
-                            System.out.println("+"+e.getMessage() + "                          "+e.fillInStackTrace());
-                            Toast.makeText(getContext().getApplicationContext(), "" + mensagem, Toast.LENGTH_LONG).show();
-                        }
-                    });
-            return pessoa;
-        }else{
-            Toast.makeText(getContext().getApplicationContext(), "E-mail ou senha incorreto" , Toast.LENGTH_LONG).show();
-            showProgress(false);
-            okButton.setEnabled(true);
-            cadastroTView.setEnabled(true);
-            return null;
-        }
-
-
-
-    }
+//    public Pessoa autenticarUsuario(Usuario usuario){
+//        if (isEmailValid(usuario.getEmail()) && isSenhaValid(usuario.getSenha())){
+//            final Pessoa pessoa = new Pessoa();
+//            pessoa.setUsuario(usuario);
+//            Log.i("TesteAutenticado", "Vou entrar no autenticar:   "  + usuario.getEmail() + "    " + usuario.getSenha());
+//            FirebaseAuth.getInstance().signInWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
+//                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<AuthResult> task) {
+//                            if(task.isSuccessful()){
+//                                Log.i("TesteAutenticado", task.getResult().getUser().getUid());
+//                                pessoa.getUsuario().setUId(task.getResult().getUser().getUid());
+//                                Query querry1 = FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
+//                                querry1.get()
+//                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//                                            @Override
+//                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                                                if (task.isSuccessful()) {
+//                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+//                                                        Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
+//                                                        pessoa.setUId(document.getId());
+//                                                        pessoa.setNome((String) document.get("nome"));
+//                                                        pessoa.setCpf((String) document.get("cpf"));
+//                                                        pessoa.setTelefone((String) document.get("telefone"));
+//                                                        pessoa.setLogin((String) document.get("login"));
+//                                                        pessoa.setDataNascimento((String) document.get("dataNascimento"));
+//                                                        pessoa.setFotoFileURL((String) document.get("fotoFileURL"));
+////                                                        Bundle bundle = new Bundle();
+////                                                        bundle.putSerializable("pessoa", pessoa);
+//                                                        Map<String, Object> map = new HashMap<>();
+//                                                        map.put("pessoa", pessoa);
+//                                                        comunicadorInterface.responde(map);
+//                                                        Log.i("TesteDeuCerto", pessoa.getNome());
+//                                                        showProgress(false);
+//                                                        okButton.setEnabled(true);
+//                                                        cadastroTView.setEnabled(true);
+//
+//                                                    }
+//                                                }
+//                                            }
+//                                        }).addOnFailureListener(new OnFailureListener() {
+//                                    @Override
+//                                    public void onFailure(@NonNull Exception e) {
+//                                        Log.i("TesteFalhaPegarDados", e.getMessage());
+////                                                        Log.w(TAG, "Error getting documents.", task.getException());
+//                                    }
+//                                });
+//
+//                            }
+//                        }
+//                    })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        String mensagem = "Erro: ";
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            showProgress(false);
+//                            okButton.setEnabled(true);
+//                            cadastroTView.setEnabled(true);
+//                            e.printStackTrace();
+//                            if(e.getMessage().equals("The email address is badly formatted.")){
+//                                mensagem += "O e-mail digitado é invalido, digite um e-mail valido";
+//                            }
+//                            if(e.getMessage().equals("There is no user record corresponding to this identifier. The user may have been deleted.") || e.getMessage().equals("The password is invalid or the user does not have a password.")){
+//                                mensagem += "E-mail ou senha incorreto";
+//                            }
+//                            System.out.println("+"+e.getMessage() + "                          "+e.fillInStackTrace());
+//                            Toast.makeText(getContext().getApplicationContext(), "" + mensagem, Toast.LENGTH_LONG).show();
+//                        }
+//                    });
+//            return pessoa;
+//        }else{
+//            Toast.makeText(getContext().getApplicationContext(), "E-mail ou senha incorreto" , Toast.LENGTH_LONG).show();
+//            showProgress(false);
+//            okButton.setEnabled(true);
+//            cadastroTView.setEnabled(true);
+//            return null;
+//        }
+//
+//    }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
@@ -228,6 +231,16 @@ public class LoginFragment extends Fragment {
             progressView.setVisibility(show ? View.VISIBLE : View.GONE);
 
         }
+    }
+
+    @Override
+    public void responde(Map<String, Object> map) {
+        boolean show = (boolean) map.get("show");
+        String mensagem = (String) map.get("mensagem");
+        Toast.makeText(getContext().getApplicationContext(), mensagem , Toast.LENGTH_LONG).show();
+        showProgress(!show);
+        okButton.setEnabled(show);
+        cadastroTView.setEnabled(show);
     }
 
 }
