@@ -3,7 +3,6 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,19 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.ViewHolder;
 
-import java.util.List;
 import java.util.Map;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
@@ -54,7 +48,15 @@ private Pessoa pessoa;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         Log.i("Teste Agora Bora", pessoa.getNome());
 //        buscarContatos();
+
         adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));
+        adapter.add(new ContatoItem(pessoa));adapter.add(new ContatoItem(pessoa));
         adapter.add(new ContatoItem(pessoa));
         adapter.add(new ContatoItem(pessoa));
         adapter.add(new ContatoItem(pessoa));
@@ -65,7 +67,6 @@ private Pessoa pessoa;
 
         return view;
 
-        
     }
 
 
@@ -88,9 +89,15 @@ private Pessoa pessoa;
             Log.i("TesteContato", "Deu ceto tb");
             fotoImgView =(CircleImageView)  viewHolder.itemView.findViewById(R.id.fotoImgView);
             nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.mensagemTView);
+            Button b = (Button)viewHolder.itemView.findViewById(R.id.fotoButton);
             if (this.pessoa1.getNome()!=null) {
                 nomeUserTView.setText(this.pessoa1.getNome());
-                Picasso.get().load(this.pessoa1.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
+                if (this.pessoa1.getFotoFileURL() == null || this.pessoa1.getFotoFileURL() ==""){
+                    b.setAlpha(1);
+                }else{
+                    b.setAlpha(0);
+                    Picasso.get().load(this.pessoa1.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
+                }
             }
         }
 

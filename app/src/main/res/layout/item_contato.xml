@@ -4,35 +4,74 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/fotoImgView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars[8]" />
-
-    <TextView
-        android:id="@+id/mensagemTView"
+    <FrameLayout
+        android:id="@+id/layoutChatPrincipal"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:text="Nome"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/bg_edittext_roudend"
-        app:layout_constraintBottom_toBottomOf="@+id/fotoImgView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/fotoImgView"
-        app:layout_constraintTop_toTopOf="@+id/fotoImgView" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/fotoImgView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:layout_constraintBottom_toBottomOf="@+id/fotoButton"
+                app:layout_constraintEnd_toEndOf="@+id/fotoButton"
+                app:layout_constraintStart_toStartOf="@+id/fotoButton"
+                app:layout_constraintTop_toTopOf="@+id/fotoButton"
+                tools:srcCompat="@tools:sample/avatars[8]" />
+
+            <TextView
+                android:id="@+id/mensagemTView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/bg_edittext_roudend"
+                android:text="Nome"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/fotoImgView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/fotoImgView"
+                app:layout_constraintTop_toTopOf="@+id/fotoImgView" />
+
+            <Button
+                android:id="@+id/fotoButton"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_button_img_roudend"
+                android:text="Foto"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>
