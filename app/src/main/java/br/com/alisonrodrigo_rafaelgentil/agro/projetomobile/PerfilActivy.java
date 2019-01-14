@@ -2,9 +2,6 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -17,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -41,30 +39,34 @@ public class PerfilActivy extends AppCompatActivity
     private TextView nomeTViewHeader;
     private Button selectImgButtonHeader;
     private CircleImageView fotoImgViewHeader;
+    private  DrawerLayout drawer;
+    Toolbar toolbar;
+    ChatFragment chatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_perfil_activy);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_perfil);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
         nomeTViewHeader = (TextView) headerView.findViewById(R.id.nomeUserTView);
@@ -77,11 +79,48 @@ public class PerfilActivy extends AppCompatActivity
             pessoa.addObserver(this);
             pessoa.notifyObservers();
         }
+
+
+
+
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
+//        perfilFragment = new PerfilFragment();
+        Map<String, Object> map = new HashMap<>();
+//        map.put("nomeButton", MaskEditUtil.EDITAR);
+//        map.put("pessoa", pessoa);
+//        map.put("drawer_layout", drawer);
+//        perfilFragment.responde(map);
+//        fragmentTransaction.replace(R.id.layoutPrincipal, perfilFragment);
+//        fragmentTransaction.commit ();
+
+
+
+//        chatFragment = new ChatFragment();
+//        map = new HashMap<>();
+//        map.put("pessoa", pessoa);
+//        map.put("drawer_layout", drawer);
+//        chatFragment.responde(map);
+//        fragmentTransaction.replace(R.id.layoutPrincipal, chatFragment);
+//        fragmentTransaction.commit ();
+
+
+//        FragmentManager fragmentManager = getFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
+                ContatoFragment contatoFragment = new ContatoFragment();
+                Map<String, Object> map1 = new HashMap<>();
+                map1.put("pessoa", pessoa);
+                contatoFragment.responde(map1);
+                fragmentTransaction.replace(R.id.layoutPrincipal, contatoFragment);
+                fragmentTransaction.commit ();
+
+
     }
+
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -89,12 +128,12 @@ public class PerfilActivy extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.perfil_activy, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.perfil_activy, menu);
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -125,12 +164,14 @@ public class PerfilActivy extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
+        Map<String, Object> map;
         switch (item.getItemId()){
             case R.id.nav_perfil:
                 perfilFragment = new PerfilFragment();
-                Map<String, Object> map = new HashMap<>();
+                map = new HashMap<>();
                 map.put("nomeButton", MaskEditUtil.EDITAR);
                 map.put("pessoa", pessoa);
+                map.put("drawer_layout", drawer);
                 perfilFragment.responde(map);
                 fragmentTransaction.replace(R.id.layoutPrincipal, perfilFragment);
                 fragmentTransaction.commit ();
@@ -148,14 +189,16 @@ public class PerfilActivy extends AppCompatActivity
 
             case R.id.nav_share:
                 break;
-            case R.id.nav_send:
-                ContatoFragment contatoFragment = new ContatoFragment();
-                Map<String, Object> map1 = new HashMap<>();
-                map1.put("pessoa", pessoa);
-                contatoFragment.responde(map1);
-
-                fragmentTransaction.replace(R.id.layoutPrincipal, contatoFragment);
+            case R.id.nav_chat:
+                chatFragment = new ChatFragment();
+                map = new HashMap<>();
+                map.put("pessoa", pessoa);
+                map.put("drawer_layout", drawer);
+                chatFragment.responde(map);
+                fragmentTransaction.replace(R.id.layoutPrincipal, chatFragment);
                 fragmentTransaction.commit ();
+
+
                 break;
             case R.id.nav_sair:
                 pessoa = null;
@@ -166,42 +209,6 @@ public class PerfilActivy extends AppCompatActivity
 
         }
 
-
-
-//        if (id == R.id.nav_perfil) {
-//            perfilFragment = new PerfilFragment();
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("nomeButton", MaskEditUtil.EDITAR);
-//            map.put("pessoa", pessoa);
-//            perfilFragment.responde(map);
-//            fragmentTransaction.replace(R.id.layoutPrincipal, perfilFragment);
-//            fragmentTransaction.commit ();
-//        } else if(id == R.id.nav_publicacoes){
-//            publicacaoFragment = new PublicacoesFragment();
-//            fragmentTransaction.replace(R.id.layoutPrincipal, publicacaoFragment);
-//            fragmentTransaction.commit ();
-//        }else if (id == R.id.nav_manage) {
-//            ContatoFragment contatoFragment = new ContatoFragment();
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("pessoa", pessoa);
-//            contatoFragment.responde(map);
-//            fragmentTransaction.replace(R.id.layoutPrincipal, contatoFragment);
-//            fragmentTransaction.commit ();
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//        else if (id == R.id.nav_sair) {
-//            pessoa = null;
-//            FirebaseAuth.getInstance().signOut();
-//            Intent intent = new Intent(PerfilActivy.this, MainActivity.class);
-//            startActivity(intent);
-//        }
-//        fragmentTransaction.addToBackStack(null);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

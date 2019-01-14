@@ -237,7 +237,9 @@ public class LoginFragment extends Fragment implements ComunicadorInterface{
     public void responde(Map<String, Object> map) {
         boolean show = (boolean) map.get("show");
         String mensagem = (String) map.get("mensagem");
-        Toast.makeText(getContext().getApplicationContext(), mensagem , Toast.LENGTH_LONG).show();
+        if (mensagem != null && mensagem !=""){
+            Toast.makeText(getContext().getApplicationContext(), mensagem , Toast.LENGTH_LONG).show();
+        }
         showProgress(!show);
         okButton.setEnabled(show);
         cadastroTView.setEnabled(show);
