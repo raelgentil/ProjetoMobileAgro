@@ -1,12 +1,9 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.model.dao;
 
-import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -34,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.ContatoFragment;
@@ -41,7 +39,7 @@ import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.LoginFragment;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.PerfilFragment;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
 
-public class PessoaDAO {
+public class PessoaDAO implements IPessoaDAO{
     FirebaseAuth auth;
 
     public PessoaDAO() {
@@ -239,27 +237,27 @@ public class PessoaDAO {
         });
     }
 
-//    private void buscarContatos(ContatoFragment fragment) {
-////        final Pessoa pessoa = null; //Modificar pra contato
-//        FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId())
-//                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                        if (e!=null){
-//                            Log.i("TesteContato", e.getMessage(),e);
-//                            return;
-//                        }
-//                        Log.i("TesteContato", "Deu Certo");
-//                        List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
-//                        for (DocumentSnapshot doc: docs) {
-//                            Pessoa pessoa1 = doc.toObject(Pessoa.class);
-//                            Log.i("TesteContato", pessoa1.getNome());
-//                            adapter.add(new ContatoFragment.ContatoItem(pessoa1));
-//                        }
-//
-//                    }
-//                });
-//    }
+    public void buscarContatos(String busca, final ContatoFragment fragment) {
+//        final Pessoa pessoa = null; //Modificar pra contato
+        FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("login", busca)
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        if (e!=null){
+                            Log.i("TesteContato", e.getMessage(),e);
+                            return;
+                        }
+                        Log.i("TesteContato", "Deu Certo");
+                        List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
+                        for (DocumentSnapshot doc: docs) {
+                            Contato contato = (Contato) doc.toObject(Contato.class);
+                            Log.i("TesteContato", contato.getNome());
+                            fragment.addItemList(contato);
+                        }
+
+                    }
+                });
+    }
 
 
 }

@@ -41,7 +41,7 @@ public class PublicacoesFragment extends Fragment {
 
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 publicacoesUser = new PublicacoesUser();
-                fragmentManager.beginTransaction().replace(R.id.layoutPrincipal, publicacoesUser).commit();
+                fragmentManager.beginTransaction().replace(R.id.layout_principal, publicacoesUser).commit();
             }
 
         });

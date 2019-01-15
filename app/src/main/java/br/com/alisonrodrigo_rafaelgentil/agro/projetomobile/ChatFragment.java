@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -57,9 +58,10 @@ public class ChatFragment extends Fragment implements ComunicadorInterface {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contato, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+//        getContext()setSupportActionBar(toolbar);
         setHasOptionsMenu(true);
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -71,7 +73,7 @@ public class ChatFragment extends Fragment implements ComunicadorInterface {
 
 
 //
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.contatosRecyclerView);
+        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
         adapter = new GroupAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -95,7 +97,7 @@ public class ChatFragment extends Fragment implements ComunicadorInterface {
                 ConversaFragment conversaFragment = new ConversaFragment();
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-                fragmentTransaction.replace (R.id.layoutMainPrincipal, conversaFragment);
+                fragmentTransaction.replace (R.id.layout_principal, conversaFragment);
 //        fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit ();
             }
@@ -103,25 +105,25 @@ public class ChatFragment extends Fragment implements ComunicadorInterface {
         Log.i("Teste Agora Bora", pessoa.getNome());
 //        buscarContatos();
 //        adapter.add(new ContatoItem(pessoa));
-        adapter.add(new ConversarItem(pessoa));
-        adapter.notifyItemInserted(adapter.getItemCount());
-        adapter.notifyDataSetChanged();
-        adapter.add(new ConversarItem(pessoa));
-        adapter.notifyItemInserted(adapter.getItemCount());
-        adapter.notifyDataSetChanged();
-        adapter.add(new ConversarItem(pessoa));
-        adapter.notifyItemInserted(adapter.getItemCount());
-        adapter.notifyDataSetChanged();
-        adapter.add(new ConversarItem(pessoa));
-        adapter.notifyItemInserted(adapter.getItemCount());
-        adapter.notifyDataSetChanged();
-        adapter.add(new ConversarItem(pessoa));
-        adapter.notifyItemInserted(adapter.getItemCount());
-        adapter.notifyDataSetChanged();
-        adapter.add(new ConversarItem(pessoa));
-        adapter.notifyItemInserted(adapter.getItemCount());
-        adapter.notifyDataSetChanged();
-
+//        adapter.add(new ConversarItem(pessoa));
+//        adapter.notifyItemInserted(adapter.getItemCount());
+//        adapter.notifyDataSetChanged();
+//        adapter.add(new ConversarItem(pessoa));
+//        adapter.notifyItemInserted(adapter.getItemCount());
+//        adapter.notifyDataSetChanged();
+//        adapter.add(new ConversarItem(pessoa));
+//        adapter.notifyItemInserted(adapter.getItemCount());
+//        adapter.notifyDataSetChanged();
+//        adapter.add(new ConversarItem(pessoa));
+//        adapter.notifyItemInserted(adapter.getItemCount());
+//        adapter.notifyDataSetChanged();
+//        adapter.add(new ConversarItem(pessoa));
+//        adapter.notifyItemInserted(adapter.getItemCount());
+//        adapter.notifyDataSetChanged();
+//        adapter.add(new ConversarItem(pessoa));
+//        adapter.notifyItemInserted(adapter.getItemCount());
+//        adapter.notifyDataSetChanged();
+        adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));adapter.add(new ConversarItem(pessoa));
 
 
 
@@ -132,11 +134,34 @@ public class ChatFragment extends Fragment implements ComunicadorInterface {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
         getActivity().getMenuInflater().inflate(R.menu.chat_activy, menu);
         super.onCreateOptionsMenu(menu, inflater);
-
     }
-//
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menuItem_buscar:
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
+                Map<String, Object> map;
+                contatoFragment = new ContatoFragment();
+                map = new HashMap<>();
+                map.put("pessoa", pessoa);
+                map.put("drawer_layout",drawer);
+                contatoFragment.responde(map);
+                fragmentTransaction.replace(R.id.layout_principal, contatoFragment);
+                fragmentTransaction.commit ();
+
+        }
+
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    //
 //    private void buscarContatos() {
 ////        final Pessoa pessoa = null; //Modificar pra contato
 //        FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId())

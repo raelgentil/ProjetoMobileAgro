@@ -13,15 +13,15 @@ import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Observe
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Subject;
 
 
-public class Pessoa implements Serializable, Subject {
+public class Pessoa extends Contato implements Subject {
     private List<Observer> observers;
     private String UId;
-    private String nome;
+//    private String nome;
     private String Cpf;
     private String telefone;
     private String login;
     private String dataNascimento;
-    private String fotoFileURL;
+//    private String fotoFileURL;
     private Uri mSelectUri;
     private Usuario usuario;
     private List<String> UIdchats;
@@ -32,9 +32,9 @@ public class Pessoa implements Serializable, Subject {
         return UId;
     }
 
-    public String getNome() {
-        return nome;
-    }
+//    public String getNome() {
+//        return nome;
+//    }
 
     public String getCpf() {
         return Cpf;
@@ -52,9 +52,9 @@ public class Pessoa implements Serializable, Subject {
         return dataNascimento;
     }
 
-    public String getFotoFileURL() {
-        return fotoFileURL;
-    }
+//    public String getFotoFileURL() {
+//        return fotoFileURL;
+//    }
 
     public Usuario getUsuario() {
         return usuario;
@@ -85,9 +85,9 @@ public class Pessoa implements Serializable, Subject {
         this.UId = UId;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+//    public void setNome(String nome) {
+//        this.nome = nome;
+//    }
 
     public void setCpf(String cpf) {
         Cpf = cpf;
@@ -105,9 +105,9 @@ public class Pessoa implements Serializable, Subject {
         this.dataNascimento = dataNascimento;
     }
 
-    public void setFotoFileURL(String fotoFileURL) {
-        this.fotoFileURL = fotoFileURL;
-    }
+//    public void setFotoFileURL(String fotoFileURL) {
+//        this.fotoFileURL = fotoFileURL;
+//    }
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;

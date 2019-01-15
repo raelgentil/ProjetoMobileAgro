@@ -2,14 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menuItem_Perfil"
-        android:title="Doido" />
-    <item
-        android:id="@+id/menuItem_publicacoes"
-        android:title="Teste" />
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/menuItem_buscar"
+        android:icon="@drawable/ic_menu_buscar_24dp"
+        android:title="buscar" />
+    <!--<item-->
+        <!--android:id="@+id/menuItem_publicacoes"-->
+        <!--android:title="Teste" />-->
+    <!--<item-->
+        <!--android:id="@+id/action_settings"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="@string/action_settings"-->
+        <!--app:showAsAction="never" />-->
 </menu>

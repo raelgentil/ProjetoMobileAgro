@@ -8,13 +8,11 @@ import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -47,9 +45,9 @@ public class PerfilActivy extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        s(true);
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -60,10 +58,10 @@ public class PerfilActivy extends AppCompatActivity
 //        });
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+//        drawer.addDrawerListener(toggle);
+//        toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
@@ -80,20 +78,16 @@ public class PerfilActivy extends AppCompatActivity
             pessoa.notifyObservers();
         }
 
-
-
-
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-//        perfilFragment = new PerfilFragment();
+        perfilFragment = new PerfilFragment();
         Map<String, Object> map = new HashMap<>();
-//        map.put("nomeButton", MaskEditUtil.EDITAR);
-//        map.put("pessoa", pessoa);
-//        map.put("drawer_layout", drawer);
-//        perfilFragment.responde(map);
-//        fragmentTransaction.replace(R.id.layoutPrincipal, perfilFragment);
-//        fragmentTransaction.commit ();
+        map.put("nomeButton", MaskEditUtil.EDITAR);
+        map.put("pessoa", pessoa);
+        map.put("drawer_layout", drawer);
+        perfilFragment.responde(map);
+        fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
+        fragmentTransaction.commit ();
 
 
 
@@ -108,12 +102,12 @@ public class PerfilActivy extends AppCompatActivity
 
 //        FragmentManager fragmentManager = getFragmentManager();
 //                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-                ContatoFragment contatoFragment = new ContatoFragment();
-                Map<String, Object> map1 = new HashMap<>();
-                map1.put("pessoa", pessoa);
-                contatoFragment.responde(map1);
-                fragmentTransaction.replace(R.id.layoutPrincipal, contatoFragment);
-                fragmentTransaction.commit ();
+//                ContatoFragment contatoFragment = new ContatoFragment();
+//                Map<String, Object> map1 = new HashMap<>();
+//                map1.put("pessoa", pessoa);
+//                contatoFragment.responde(map1);
+//                fragmentTransaction.replace(R.id.layoutPrincipal, contatoFragment);
+//                fragmentTransaction.commit ();
 
 
     }
@@ -128,12 +122,12 @@ public class PerfilActivy extends AppCompatActivity
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.perfil_activy, menu);
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.perfil_activy, menu);
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -146,12 +140,12 @@ public class PerfilActivy extends AppCompatActivity
             args.putSerializable("pessoa", pessoa);
             args.putSerializable("nomeButton", MaskEditUtil.EDITAR);
             perfilFragment.setArguments(args);
-            fragmentTransaction.replace(R.id.layoutPrincipal, perfilFragment);
+            fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit ();
         } else if(id == R.id.menuItem_publicacoes){
             publicacaoFragment = new PublicacoesFragment();
-            fragmentTransaction.replace(R.id.layoutPrincipal, publicacaoFragment);
+            fragmentTransaction.replace(R.id.layout_principal, publicacaoFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit ();
         }
@@ -173,13 +167,13 @@ public class PerfilActivy extends AppCompatActivity
                 map.put("pessoa", pessoa);
                 map.put("drawer_layout", drawer);
                 perfilFragment.responde(map);
-                fragmentTransaction.replace(R.id.layoutPrincipal, perfilFragment);
+                fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
                 fragmentTransaction.commit ();
                 break;
 
             case R.id.nav_publicacoes:
                 publicacaoFragment = new PublicacoesFragment();
-                fragmentTransaction.replace(R.id.layoutPrincipal, publicacaoFragment);
+                fragmentTransaction.replace(R.id.layout_principal, publicacaoFragment);
                 fragmentTransaction.commit ();
                 break;
 
@@ -195,7 +189,7 @@ public class PerfilActivy extends AppCompatActivity
                 map.put("pessoa", pessoa);
                 map.put("drawer_layout", drawer);
                 chatFragment.responde(map);
-                fragmentTransaction.replace(R.id.layoutPrincipal, chatFragment);
+                fragmentTransaction.replace(R.id.layout_principal, chatFragment);
                 fragmentTransaction.commit ();
 
 

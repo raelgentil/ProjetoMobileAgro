@@ -56,7 +56,7 @@
                 app:layout_constraintStart_toStartOf="parent">
 
                 <android.support.constraint.ConstraintLayout
-                    android:id="@+id/layoutPrincipal"
+                    android:id="@+id/layout_fragmento_principal"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="0dp"
