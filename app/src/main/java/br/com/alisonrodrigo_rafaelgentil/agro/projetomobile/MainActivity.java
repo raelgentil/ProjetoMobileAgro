@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.ClienteDao;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
@@ -31,7 +32,7 @@ import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.Comunicad
 
 public class MainActivity extends AppCompatActivity implements ComunicadorInterface {
 
-    private ClienteDao clienteDao;
+    private PessoaDAO pessoaDAO;
     private Pessoa pessoa;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;

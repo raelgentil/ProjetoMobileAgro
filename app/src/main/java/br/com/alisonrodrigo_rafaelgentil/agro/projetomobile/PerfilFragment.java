@@ -6,41 +6,35 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.Map;
-import java.util.UUID;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
@@ -69,6 +63,7 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
     private String nomeButton;
     private Activity activity;
     private View progressView;
+    private  DrawerLayout drawer;
 //    private Uri mSelectUri;
 
 
@@ -82,6 +77,24 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_perfil, container, false);
+
+
+
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+//        getContext()setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+//        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+
+
+
+
 
         nomeText = (EditText) view.findViewById(R.id.nomeText);
         cpfText = (EditText) view.findViewById(R.id.cpfText);
@@ -147,6 +160,8 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
                 }
             }
         });
+
+//        esconderTecladoHideKeyboard(view);
         return view;
     }
 
@@ -168,88 +183,6 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
             Picasso.get().load(pessoa.getmSelectUri()).resize(350, 350).centerCrop().into(fotoImgView);
         }
     }
-
-//    private void salvar(){
-//        pessoa = pegarDadosTela();
-//        FirebaseAuth.getInstance().createUserWithEmailAndPassword(pessoa.getUsuario().getEmail(), pessoa.getUsuario().getSenha())
-//                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<AuthResult> task) {
-//                        if(task.isSuccessful()){
-//                            Log.i("Teste", task.getResult().getUser().getUid());
-//                            pessoa.getUsuario().setUId(task.getResult().getUser().getUid());
-//                            Log.i("Teste", pessoa.getUsuario().getUId());
-//                            salvarFoto();
-//                        }else{
-//                            String erroException="";
-//                            try {
-//                                throw task.getException();
-//                            } catch (FirebaseAuthWeakPasswordException e) {
-//                                erroException = "Digite uma senha mais forte, contendo no minimo 8 caracter";
-//                            }catch (FirebaseAuthInvalidCredentialsException e) {
-//                                erroException = "O e-mail digitado é invalido, digite outro e-mail";
-//                            }catch (FirebaseAuthUserCollisionException e) {
-//                                erroException = "Esse e-mail ja foi cadastrado no sistema, digite outro e-mail";
-//                            }catch (Exception e) {
-//                                erroException = "Erro ao Cadastrar Usuario" ;
-//                            }
-//                            Toast.makeText(getContext().getApplicationContext(), "Erro: " + erroException, Toast.LENGTH_LONG).show();
-//                        }
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.i("Teste", e.getMessage());
-//                    }
-//                });
-//    }
-
-//    private void salvarFoto() {
-//        String fileName = UUID.randomUUID().toString();
-//        final StorageReference ref = FirebaseStorage.getInstance().getReference("/images/perfil" + fileName);
-//        ref.putFile(pessoa.getmSelectUri())
-//                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-//                    @Override
-//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-//                        ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                            @Override
-//                            public void onSuccess(Uri uri) {
-//                                String uid = FirebaseAuth.getInstance().getUid();
-//                                String fotoFileURL = uri.toString();
-//
-//                                pessoa.setFotoFileURL(fotoFileURL);
-//                                Log.i("TesteFoto", fotoFileURL);
-//                                salvarPessoa();
-//                            }
-//                        });
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                    Log.i("Teste", e.getMessage(), e);
-//            }
-//        });
-//    }
-
-//    private void salvarPessoa() {
-//        FirebaseFirestore.getInstance().collection("pessoa").add(pessoa.getMap())
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        Log.i("TesteUser", documentReference.getId());
-//                        pessoa.setUId(documentReference.getId());
-//                        Toast.makeText(getContext(),"Usuário salvo com sucesso!", Toast.LENGTH_LONG).show();
-//                    }
-//                }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Log.i("Teste", e.getMessage());
-//                Toast.makeText(getContext(),"Erro ao salvar Usuario!", Toast.LENGTH_LONG).show();
-//            }
-//        });
-//    }
 
     private void atualizar(){
         pegarDadosTela();
@@ -327,12 +260,23 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
             }
         }
     }
+//    private void esconderTecladoHideKeyboard(View v) {
+//        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(getContext().INPUT_METHOD_SERVICE);
+//        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        getActivity().getMenuInflater().inflate(R.menu.perfil_activy, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
     @Override
     public void responde(Map<String, Object> map) {
 //        okButton.setText((String)map.get("nomeButton"));
         nomeButton = (String)map.get("nomeButton");
         pessoa = (Pessoa) map.get("pessoa");
+        drawer = (DrawerLayout) map.get("drawer_layout");
         String mensagem = (String)map.get("mensagem");
 
             if (mensagem!= null && mensagem !="") {

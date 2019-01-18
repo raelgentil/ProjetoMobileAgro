@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menuItem_Perfil"
-        android:title="Perfil" />
+        android:title="editar" />
     <item
         android:id="@+id/menuItem_publicacoes"
         android:title="Publicações" />
