@@ -66,7 +66,7 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
     private View progressView;
     private  DrawerLayout drawer;
     private IFachada fachada;
-
+//    private String
 
     public PerfilFragment() {
         // Required empty public constructor
@@ -91,11 +91,6 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-
-
-
-
 
         nomeText = (EditText) view.findViewById(R.id.nomeText);
         cpfText = (EditText) view.findViewById(R.id.cpfText);
@@ -237,6 +232,8 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
     private void voltarTelaLogin(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         LoginFragment loginFragment = new LoginFragment();
+        loginFragment.setFachada(fachada);
+        loginFragment.setDrawer(drawer);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         fragmentTransaction.replace (R.id.layoutMainPrincipal, loginFragment);
         fragmentTransaction.addToBackStack(null);

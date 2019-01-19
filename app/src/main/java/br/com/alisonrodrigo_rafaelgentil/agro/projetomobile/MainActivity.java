@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements IComunicadorInter
         pessoa.addObserver(this);
         fachada.verificarUserLogado(pessoa);
 
-
     }
 
     public void abrirTelaLogin(){
