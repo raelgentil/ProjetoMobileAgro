@@ -54,7 +54,7 @@
 
             <include
                 android:id="@+id/menutoolbar"
-                layout="@layout/app_bar_perfil_activy"
+                layout="@layout/content_activy_bar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"

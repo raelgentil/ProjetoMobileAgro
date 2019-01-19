@@ -4,6 +4,8 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,25 +25,30 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
+import com.xwray.groupie.OnItemClickListener;
 import com.xwray.groupie.ViewHolder;
 
 import java.util.Map;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ContatoFragment extends Fragment implements ComunicadorInterface {
+public class ContatoFragment extends Fragment implements IComunicadorInterface {
 
 private GroupAdapter adapter;
     private Pessoa pessoa;
     private DrawerLayout drawer;
+    private ConversaFragment conversaFragment;
+    private IFachada fachada;
     public ContatoFragment() {
         // Required empty public constructor
     }
@@ -64,28 +71,44 @@ private GroupAdapter adapter;
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
         adapter = new GroupAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        Log.i("Teste Agora Bora", pessoa.getNome());
-
+        adapter.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(@NonNull Item item, @NonNull View view) {
+                conversaFragment = new ConversaFragment();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
+                fragmentTransaction.replace (R.id.layout_principal, conversaFragment);
+//        fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit ();
+            }
+        });
         return view;
 
     }
 
     public void addItemList(Contato contato){
-        adapter.add(new ContatoItem(contato));
-        adapter.notifyDataSetChanged();
+        for (int i = 0; i < adapter.getItemCount(); i++) {
+            ContatoItem contatoItem = (ContatoItem) adapter.getItem(i);
+            Contato contato1 = contatoItem.contato;
+            if (!(contato1.getUId().equals(contato))){
+                adapter.add(new ContatoItem(contato));
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
+
+
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
 
         getActivity().getMenuInflater().inflate(R.menu.contato_activy, menu);
         SearchView searchView = (SearchView) menu.findItem(R.id.menuItem_contato_buscar).getActionView();
-        searchView.setOnQueryTextListener(new SearchFiltro(this));
+        searchView.setOnQueryTextListener(new SearchFiltro());
 //        SearchView searchView = new SearchView(getActivity());
 //        searchView.setOnQueryTextListener(new SearchFiltro());
         super.onCreateOptionsMenu(menu, inflater);
@@ -96,8 +119,11 @@ private GroupAdapter adapter;
     @Override
     public void responde(Map<String, Object> map) {
         pessoa =(Pessoa) map.get("pessoa");
+        fachada =(Fachada) map.get("fachada");
         drawer = (DrawerLayout) map.get("drawer_layout");
     }
+
+
 
     public class ContatoItem extends Item<ViewHolder>{
         private  final Contato contato;
@@ -119,7 +145,7 @@ private GroupAdapter adapter;
                     b.setAlpha(1);
                 }else{
                     b.setAlpha(0);
-                    Picasso.get().load(this.contato.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
+                    Picasso.get().load(this.contato.getFotoFileURL()).resize(50, 50).centerCrop().into(fotoImgView);
                 }
             }
         }
@@ -131,18 +157,20 @@ private GroupAdapter adapter;
     }
 
     private class SearchFiltro implements SearchView.OnQueryTextListener {
-        ContatoFragment contatoFragment;
+//        ContatoFragment contatoFragment;
 
-        public SearchFiltro(ContatoFragment contatoFragment) {
-            this.contatoFragment = contatoFragment;
+        public SearchFiltro() {
         }
+
+//        public SearchFiltro(ContatoFragment contatoFragment) {
+//            this.contatoFragment = contatoFragment;
+//        }
 
         @Override
         public boolean onQueryTextSubmit(String s) {
-            Log.i("TesteSearchFiltro", " onQueryTextSubmit:    " + s);
-            PessoaDAO pessoaDAO = new PessoaDAO();
-            pessoaDAO.buscarContatos(s,contatoFragment);
-
+                Log.i("TesteSearchFiltro", " onQueryTextSubmit:    " + s);
+//                PessoaDAO pessoaDAO = new PessoaDAO();
+                fachada.buscarContatos(s,ContatoFragment.this);
             return false;
         }
 

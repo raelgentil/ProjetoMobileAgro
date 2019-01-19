@@ -21,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,17 +35,19 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Map;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Observer;
-import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PerfilFragment extends Fragment implements Observer, ComunicadorInterface {
+public class PerfilFragment extends Fragment implements IObserver, IComunicadorInterface {
 
     private Pessoa pessoa;
     private EditText nomeText;
@@ -64,7 +65,7 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
     private Activity activity;
     private View progressView;
     private  DrawerLayout drawer;
-//    private Uri mSelectUri;
+    private IFachada fachada;
 
 
     public PerfilFragment() {
@@ -148,8 +149,9 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
                     showProgress(true);
                     pegarDadosTela();
                     abilitarCampos(false);
-                    PessoaDAO p = new PessoaDAO();
-                    p.salvar(pessoa, PerfilFragment.this);
+//                    PessoaDAO p = new PessoaDAO();
+//                    p.salvar(pessoa, PerfilFragment.this);
+                    fachada.salvarPessoa(pessoa, PerfilFragment.this);
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.ATUALIZAR)){
                     atualizar();
@@ -228,6 +230,10 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
         selectImgButton.setEnabled(ativar);
     }
 
+    public void setFachada(IFachada fachada) {
+        this.fachada = fachada;
+    }
+
     private void voltarTelaLogin(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         LoginFragment loginFragment = new LoginFragment();
@@ -258,6 +264,7 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
                 selectImgButton.setAlpha(0);
                 Picasso.get().load(pessoa.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
             }
+
         }
     }
 //    private void esconderTecladoHideKeyboard(View v) {
@@ -276,6 +283,7 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
 //        okButton.setText((String)map.get("nomeButton"));
         nomeButton = (String)map.get("nomeButton");
         pessoa = (Pessoa) map.get("pessoa");
+        fachada = (Fachada) map.get("fachada");
         drawer = (DrawerLayout) map.get("drawer_layout");
         String mensagem = (String)map.get("mensagem");
 
@@ -289,6 +297,7 @@ public class PerfilFragment extends Fragment implements Observer, ComunicadorInt
             }
         }
     }
+
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {

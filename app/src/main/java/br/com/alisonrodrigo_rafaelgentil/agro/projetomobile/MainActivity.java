@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,44 +21,48 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.ClienteDao;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
-import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 
 
-public class MainActivity extends AppCompatActivity implements ComunicadorInterface {
+public class MainActivity extends AppCompatActivity implements IComunicadorInterface, IObserver {
 
     private PessoaDAO pessoaDAO;
     private Pessoa pessoa;
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+    private IFachada fachada;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_main_activy);
-        verificarUserLogado();
+        setContentView(R.layout.activity_main);
 
+        drawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
 
-
-//        ChatFragment  chatFragment = new ChatFragment();
-//        FragmentManager fragmentManager2 = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction ();
-//        fragmentTransaction2.replace (R.id.layoutMainPrincipal, chatFragment, "mainFrag");
-//        fragmentTransaction2.commit ();
-
-        // Write a message to the database
+        fachada = new Fachada();
+        pessoa = new Pessoa();
+        pessoa.addObserver(this);
+        fachada.verificarUserLogado(pessoa);
 
 
     }
 
     public void abrirTelaLogin(){
         LoginFragment loginFragment = new LoginFragment();
+        pessoa.removeObserver(this);
+        loginFragment.setFachada(fachada);
+        loginFragment.setDrawer(drawer);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         fragmentTransaction.replace (R.id.layoutMainPrincipal, loginFragment);
@@ -65,61 +70,16 @@ public class MainActivity extends AppCompatActivity implements ComunicadorInterf
         fragmentTransaction.commit ();
     }
 
-    public void verificarUserLogado(){
-        pessoa = new Pessoa();
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-//            Toast.makeText(getApplicationContext(), "Bem vindo de volta "  + "!", Toast.LENGTH_LONG).show();
-            Usuario u = new Usuario();
-            u.setUId(user.getUid());
-            u.setEmail(user.getEmail());
-            pessoa.setUsuario(u);
-            pegarDadosPessoa();
-
-        } else {
-            abrirTelaLogin();
-        }
-    }
-
-    private void pegarDadosPessoa() {
-
-        Query querry1 = FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
-        querry1.get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
-                                pessoa.setUId(document.getId());
-                                pessoa.setNome((String) document.get("nome"));
-                                pessoa.setCpf((String) document.get("cpf"));
-                                pessoa.setTelefone((String) document.get("telefone"));
-                                pessoa.setLogin((String) document.get("login"));
-                                pessoa.setDataNascimento((String) document.get("dataNascimento"));
-                                pessoa.setFotoFileURL((String) document.get("fotoFileURL"));
-                                abrirTeladeUsuario();
-                            }
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.i("TesteFalhaPegarDados", e.getMessage());
-//                                                        Log.w(TAG, "Error getting documents.", task.getException());
-            }
-        });
-    }
-
-
     public void abrirTeladeUsuario(){
         Bundle args = null;
         if(pessoa != null){
-            Toast.makeText(getApplicationContext(), "Bem vindo " + pessoa.getNome(), Toast.LENGTH_LONG).show();
+            pessoa.removeObserver(this);  // lembrar de verificar se quando usar o botão de voltar
+                                            //permanece a mesma instancia da MainActivity ou se é uma nova
+//            Toast.makeText(getApplicationContext(), "Bem vindo " + pessoa.getNome(), Toast.LENGTH_LONG).show();
             args = new Bundle();
             args.putSerializable("pessoa", pessoa);
             Intent intent = new Intent(MainActivity.this, PerfilActivy.class);
+
 //            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("args", args);
             startActivity(intent);
@@ -133,11 +93,19 @@ public class MainActivity extends AppCompatActivity implements ComunicadorInterf
         abrirTeladeUsuario();
     }
 
-//    @Override
-//    public void responde(Bundle bundle) {
-//        pessoa = (Pessoa) bundle.getSerializable("pessoa");
-//        abrirTeladeUsuario();
-//    }
+    @Override
+    public void update(Object observado) {
+        if (observado instanceof Pessoa){
+            pessoa = (Pessoa) observado;
+            Log.i("TesteUpdate", "Atualizando");
+            if (pessoa.getUsuario().getUId() != null) {
+                Toast.makeText(getApplicationContext(), "Bem vindo de volta " +pessoa.getNome() + "!", Toast.LENGTH_LONG).show();
+                abrirTeladeUsuario();
+            } else {
+                abrirTelaLogin();
+            }
+        }
+    }
 
 
 

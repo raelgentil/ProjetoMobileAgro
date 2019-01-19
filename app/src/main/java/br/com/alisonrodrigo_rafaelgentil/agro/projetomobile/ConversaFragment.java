@@ -7,10 +7,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -24,76 +27,88 @@ import com.xwray.groupie.ViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Mensagem;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Observer;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ConversaFragment extends Fragment implements Observer{
+public class ConversaFragment extends Fragment implements IObserver, IComunicadorInterface {
     private GroupAdapter adapter;
-    private Pessoa pessoa;
-    List<Mensagem> mensagens;
+    private Contato contato;
+    private Contato meuContato;
 
+    private RecyclerView recyclerView;
+    private EditText mensagemText;
+    private Button okButton;
+    private Conversa conversa;
 
     public ConversaFragment() {
-        this.mensagens = new ArrayList<>();
-        // Required empty public constructor
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_conversa, container, false);
-        RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
+
+        mensagemText = view.findViewById(R.id.mensagemText);
+        okButton = view.findViewById(R.id.okButton);
+        mensagemText.setMovementMethod(new ScrollingMovementMethod());
+        recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
         adapter = new GroupAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String texto = mensagemText.getText().toString();
+                if (texto!= null && texto !=""){
+                    Mensagem mensagem = new Mensagem();
+                    mensagem.setTexto(texto);
+                    mensagem.setRecebida(false);
+                    mensagem.setVisualizada(false);
+
+                    conversa.addMensagem(mensagem);
+                }
+            }
+        });
 //        adapter
 //        Log.i("Teste Agora Bora", pessoa.getNome());
-        buscarContatos();
+//        buscar();
 //        adapter.add(new ContatoItem(pessoa));
         return view;
 
-
     }
 
-    private void buscarContatos() {
-//        final Pessoa pessoa = null; //Modificar pra contato
-        FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId())
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e!=null){
-                            Log.i("TestContato", e.getMessage(),e);
-                            return;
-                        }
-                        List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
-                        for (DocumentSnapshot doc: docs) {
-                            Pessoa pessoa1 = doc.toObject(Pessoa.class);
-
-
-                        }
-
-                    }
-                });
+    public Conversa getConversa() {
+        return conversa;
     }
 
     @Override
     public void update(Object observado) {
-
+        if (observado instanceof Mensagem){
+            Mensagem mensagem = (Mensagem) observado;
+            addMensagem(mensagem);
+        }
     }
 
-    public void addMensagem(Mensagem mensagem){
-        this.mensagens.add(mensagem);
+    private void addMensagem(Mensagem mensagem){
         adapter.add(new MensagemItem(mensagem));
+    }
 
+    @Override
+    public void responde(Map<String, Object> map) {
+        conversa = (Conversa) map.get("conversa");
+        conversa.addObserver(this);
     }
 
 

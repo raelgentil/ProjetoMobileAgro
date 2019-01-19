@@ -7,11 +7,10 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,42 +19,32 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import com.google.firebase.firestore.Query;
 //import com.google.firebase.database.Query;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
-import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginFragment extends Fragment implements ComunicadorInterface{
+public class LoginFragment extends Fragment implements IComunicadorInterface {
 
     private TextView cadastroTView;
     private Button okButton;
     private PerfilFragment perfilFragment;
-    private ComunicadorInterface comunicadorInterface;
+    private IComunicadorInterface iComunicadorInterface;
     private EditText loginText;
     private EditText senhaText;
     private View progressView;
-    private FirebaseUser user;
-    private FirebaseAuth mAuth;
+    private DrawerLayout drawer;
+   private IFachada fachada;
 
     public LoginFragment() {}
 
@@ -69,7 +58,6 @@ public class LoginFragment extends Fragment implements ComunicadorInterface{
         senhaText = (EditText) view.findViewById(R.id.senhaText);
         okButton = (Button) view.findViewById(R.id.entrarButton);
         progressView = view.findViewById(R.id.login_progress);
-        mAuth = FirebaseAuth.getInstance();
         cadastroTView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,9 +74,11 @@ public class LoginFragment extends Fragment implements ComunicadorInterface{
                 Usuario u = new Usuario();
                 u.setEmail(loginText.getText().toString());
                 u.setSenha(senhaText.getText().toString());
-//                autenticarUsuario(u);
-                PessoaDAO pessoaDAO = new PessoaDAO();
-                pessoaDAO.autenticarUsuario(u, LoginFragment.this);
+//                autenticar(u);
+//                PessoaDAO pessoaDAO = new PessoaDAO();
+//                pessoaDAO.autenticar(u, );
+
+                fachada.autenticarUsuario(u,LoginFragment.this);
                 }
         });
         return view;
@@ -100,7 +90,10 @@ public class LoginFragment extends Fragment implements ComunicadorInterface{
         Map<String, Object> map = new HashMap<>();
         map.put("nomeButton", MaskEditUtil.SALVAR);
         map.put("pessoa", new Pessoa());
+        map.put("fachada", fachada);
+        map.put("drawer_layout", drawer);
         perfilFragment.responde(map);
+        perfilFragment.setFachada(fachada);
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         fragmentTransaction.replace (R.id.layoutMainPrincipal, perfilFragment);
@@ -111,93 +104,21 @@ public class LoginFragment extends Fragment implements ComunicadorInterface{
 
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof ComunicadorInterface) {
-            comunicadorInterface = (ComunicadorInterface)context;
+        if (context instanceof IComunicadorInterface) {
+            iComunicadorInterface = (IComunicadorInterface)context;
         } else {
             throw new ClassCastException();
         }
 
     }
 
-//    public Pessoa autenticarUsuario(Usuario usuario){
-//        if (isEmailValid(usuario.getEmail()) && isSenhaValid(usuario.getSenha())){
-//            final Pessoa pessoa = new Pessoa();
-//            pessoa.setUsuario(usuario);
-//            Log.i("TesteAutenticado", "Vou entrar no autenticar:   "  + usuario.getEmail() + "    " + usuario.getSenha());
-//            FirebaseAuth.getInstance().signInWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
-//                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<AuthResult> task) {
-//                            if(task.isSuccessful()){
-//                                Log.i("TesteAutenticado", task.getResult().getUser().getUid());
-//                                pessoa.getUsuario().setUId(task.getResult().getUser().getUid());
-//                                Query querry1 = FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
-//                                querry1.get()
-//                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                                            @Override
-//                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                                                if (task.isSuccessful()) {
-//                                                    for (QueryDocumentSnapshot document : task.getResult()) {
-//                                                        Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
-//                                                        pessoa.setUId(document.getId());
-//                                                        pessoa.setNome((String) document.get("nome"));
-//                                                        pessoa.setCpf((String) document.get("cpf"));
-//                                                        pessoa.setTelefone((String) document.get("telefone"));
-//                                                        pessoa.setLogin((String) document.get("login"));
-//                                                        pessoa.setDataNascimento((String) document.get("dataNascimento"));
-//                                                        pessoa.setFotoFileURL((String) document.get("fotoFileURL"));
-////                                                        Bundle bundle = new Bundle();
-////                                                        bundle.putSerializable("pessoa", pessoa);
-//                                                        Map<String, Object> map = new HashMap<>();
-//                                                        map.put("pessoa", pessoa);
-//                                                        comunicadorInterface.responde(map);
-//                                                        Log.i("TesteDeuCerto", pessoa.getNome());
-//                                                        showProgress(false);
-//                                                        okButton.setEnabled(true);
-//                                                        cadastroTView.setEnabled(true);
-//
-//                                                    }
-//                                                }
-//                                            }
-//                                        }).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        Log.i("TesteFalhaPegarDados", e.getMessage());
-////                                                        Log.w(TAG, "Error getting documents.", task.getException());
-//                                    }
-//                                });
-//
-//                            }
-//                        }
-//                    })
-//                    .addOnFailureListener(new OnFailureListener() {
-//                        String mensagem = "Erro: ";
-//                        @Override
-//                        public void onFailure(@NonNull Exception e) {
-//                            showProgress(false);
-//                            okButton.setEnabled(true);
-//                            cadastroTView.setEnabled(true);
-//                            e.printStackTrace();
-//                            if(e.getMessage().equals("The email address is badly formatted.")){
-//                                mensagem += "O e-mail digitado é invalido, digite um e-mail valido";
-//                            }
-//                            if(e.getMessage().equals("There is no user record corresponding to this identifier. The user may have been deleted.") || e.getMessage().equals("The password is invalid or the user does not have a password.")){
-//                                mensagem += "E-mail ou senha incorreto";
-//                            }
-//                            System.out.println("+"+e.getMessage() + "                          "+e.fillInStackTrace());
-//                            Toast.makeText(getContext().getApplicationContext(), "" + mensagem, Toast.LENGTH_LONG).show();
-//                        }
-//                    });
-//            return pessoa;
-//        }else{
-//            Toast.makeText(getContext().getApplicationContext(), "E-mail ou senha incorreto" , Toast.LENGTH_LONG).show();
-//            showProgress(false);
-//            okButton.setEnabled(true);
-//            cadastroTView.setEnabled(true);
-//            return null;
-//        }
-//
-//    }
+    public void setFachada(IFachada fachada) {
+        this.fachada = fachada;
+    }
+
+    public void setDrawer(DrawerLayout drawer) {
+        this.drawer = drawer;
+    }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
@@ -237,12 +158,23 @@ public class LoginFragment extends Fragment implements ComunicadorInterface{
     public void responde(Map<String, Object> map) {
         boolean show = (boolean) map.get("show");
         String mensagem = (String) map.get("mensagem");
-        if (mensagem != null && mensagem !=""){
+        Pessoa pessoa = (Pessoa) map.get("pessoa");
+//        fachada = (Fachada)map.get("fachada");
+//        drawer = (DrawerLayout) map.get("drawer_layout");
+        if ( mensagem != null && mensagem !="" ){
             Toast.makeText(getContext().getApplicationContext(), mensagem , Toast.LENGTH_LONG).show();
         }
-        showProgress(!show);
-        okButton.setEnabled(show);
-        cadastroTView.setEnabled(show);
+        if ( pessoa!=null ){
+            map = new HashMap<>();
+            map.put("pessoa", pessoa);
+            iComunicadorInterface.responde(map);
+        }
+            showProgress(!show);
+            okButton.setEnabled(show);
+            cadastroTView.setEnabled(show);
+
+
     }
+
 
 }

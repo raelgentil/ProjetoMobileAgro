@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Contato implements Serializable {
     private String fotoFileURL;
     private String nome;
+    private String UId;
 
     public Contato() {
     }
@@ -15,9 +16,13 @@ public class Contato implements Serializable {
     public void setNome(String nome) {
         this.nome = nome;
     }
+    public void setUId(String UId) {
+        this.UId = UId;
+    }
 
-
-
+    public String getUId() {
+        return UId;
+    }
     public String getFotoFileURL() {
         return fotoFileURL;
     }

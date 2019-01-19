@@ -1,4 +1,4 @@
-package br.com.alisonrodrigo_rafaelgentil.agro.model.dao;
+package br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -31,19 +32,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.interfaces.IPessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.ContatoFragment;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.LoginFragment;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.PerfilFragment;
-import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.ComunicadorInterface;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 
-public class PessoaDAO implements IPessoaDAO{
+public class PessoaDAO implements IPessoaDAO {
     FirebaseAuth auth;
+    FirebaseFirestore firestore;
 
-    public PessoaDAO() {
-        this.auth = FirebaseAuth.getInstance();
+    public PessoaDAO(FirebaseAuth auth, FirebaseFirestore firestore) {
+        this.auth = auth;
+        this.firestore = firestore;
     }
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
@@ -55,20 +59,20 @@ public class PessoaDAO implements IPessoaDAO{
         return senha.length() > 5;
     }
 
-    public boolean autenticarUsuario(Usuario usuario, final LoginFragment fragment){
-//        final ComunicadorInterface comunicadorInterface = (ComunicadorInterface) fragment.getContext();
+    public boolean autenticar(Usuario usuario, final LoginFragment fragment){
+//        final IComunicadorInterface comunicadorInterface = (IComunicadorInterface) fragment.getContext();
         if (isEmailValid(usuario.getEmail()) && isSenhaValid(usuario.getSenha())){
             final Pessoa pessoa = new Pessoa();
             pessoa.setUsuario(usuario);
             Log.i("TesteAutenticado", "Vou entrar no autenticar:   "  + usuario.getEmail() + "    " + usuario.getSenha());
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
+           auth.signInWithEmailAndPassword(usuario.getEmail(), usuario.getSenha())
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
                                 Log.i("TesteAutenticado", task.getResult().getUser().getUid());
                                 pessoa.getUsuario().setUId(task.getResult().getUser().getUid());
-                                Query querry1 = FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
+                                Query querry1 = firestore.collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
                                 querry1.get()
                                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
@@ -85,14 +89,12 @@ public class PessoaDAO implements IPessoaDAO{
                                                         pessoa.setFotoFileURL((String) document.get("fotoFileURL"));
                                                         Map<String, Object> map = new HashMap<>();
                                                         map.put("pessoa", pessoa);
-                                                        ((ComunicadorInterface)fragment.getContext()).responde(map);
+//                                                        ((IComunicadorInterface)fragment.getContext()).responde(map);
                                                         Log.i("TesteDeuCerto", pessoa.getNome());
                                                         map.put("show", true);
                                                         map.put("mensagem", "");
                                                         fragment.responde(map);
-// showProgress(false);
-//                                                        okButton.setEnabled(true);
-//                                                        cadastroTView.setEnabled(true);
+
 
                                                     }
                                                 }
@@ -148,7 +150,7 @@ public class PessoaDAO implements IPessoaDAO{
     public void salvar(final Pessoa pessoa, final PerfilFragment fragment){
 //        pessoa = pegarDadosTela();
         final String mesagem = "";
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword(pessoa.getUsuario().getEmail(), pessoa.getUsuario().getSenha())
+        auth.createUserWithEmailAndPassword(pessoa.getUsuario().getEmail(), pessoa.getUsuario().getSenha())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -237,26 +239,52 @@ public class PessoaDAO implements IPessoaDAO{
         });
     }
 
-    public void buscarContatos(String busca, final ContatoFragment fragment) {
-//        final Pessoa pessoa = null; //Modificar pra contato
-        FirebaseFirestore.getInstance().collection("pessoa").whereEqualTo("login", busca)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                        if (e!=null){
-                            Log.i("TesteContato", e.getMessage(),e);
-                            return;
-                        }
-                        Log.i("TesteContato", "Deu Certo");
-                        List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
-                        for (DocumentSnapshot doc: docs) {
-                            Contato contato = (Contato) doc.toObject(Contato.class);
-                            Log.i("TesteContato", contato.getNome());
-                            fragment.addItemList(contato);
-                        }
+    public Pessoa verificarUserLogado(Pessoa pessoa){
+//        auth = FirebaseAuth.getInstance();
+        Log.i("TesteAutenticacao   :", "Entrei no metodo pessoaDAO.verificarUserLogado");
+        FirebaseUser user = auth.getCurrentUser();
 
+        if (user != null) {
+//            Toast.makeText(getApplicationContext(), "Bem vindo de volta "  + "!", Toast.LENGTH_LONG).show();
+            Usuario u = new Usuario();
+            u.setUId(user.getUid());
+            u.setEmail(user.getEmail());
+            Log.i("TesteAutenticacao   :", user.getEmail());
+            pessoa.setUsuario(u);
+
+        }
+        Log.i("TesteAutenticacao   :", "Vou retornar");
+        return pessoa;
+    }
+
+    public void pegarDadosPessoa(final Pessoa pessoa) {
+
+        Query querry1 = firestore.collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
+        querry1.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
+                                pessoa.setUId(document.getId());
+                                pessoa.setNome((String) document.get("nome"));
+                                pessoa.setCpf((String) document.get("cpf"));
+                                pessoa.setTelefone((String) document.get("telefone"));
+                                pessoa.setLogin((String) document.get("login"));
+                                pessoa.setDataNascimento((String) document.get("dataNascimento"));
+                                pessoa.setFotoFileURL((String) document.get("fotoFileURL"));
+                                pessoa.notifyObservers();
+                            }
+                        }
                     }
-                });
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i("TesteFalhaPegarDados", e.getMessage());
+//                                                        Log.w(TAG, "Error getting documents.", task.getException());
+            }
+        });
     }
 
 

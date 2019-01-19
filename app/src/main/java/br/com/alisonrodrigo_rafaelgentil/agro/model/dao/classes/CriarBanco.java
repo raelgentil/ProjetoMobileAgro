@@ -1,4 +1,4 @@
-package br.com.alisonrodrigo_rafaelgentil.agro.model.dao;
+package br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

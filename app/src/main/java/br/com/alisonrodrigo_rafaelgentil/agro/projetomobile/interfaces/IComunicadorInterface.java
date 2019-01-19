@@ -4,7 +4,7 @@ import android.os.Bundle;
 
 import java.util.Map;
 
-public interface ComunicadorInterface {
+public interface IComunicadorInterface {
 
     public void responde(Map<String, Object> map);
 }

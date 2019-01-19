@@ -3,19 +3,18 @@ package br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes;
 import android.net.Uri;
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Observer;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Subject;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.ISubject;
 
 
-public class Pessoa extends Contato implements Subject {
-    private List<Observer> observers;
-    private String UId;
+public class Pessoa extends Contato implements ISubject {
+    private List<IObserver> observers;
+
 //    private String nome;
     private String Cpf;
     private String telefone;
@@ -28,9 +27,7 @@ public class Pessoa extends Contato implements Subject {
 
     public Pessoa() {this.observers = new ArrayList<>(); this.usuario = new Usuario(); this.UIdchats = new ArrayList<>();}
 
-    public String getUId() {
-        return UId;
-    }
+
 
 //    public String getNome() {
 //        return nome;
@@ -81,9 +78,7 @@ public class Pessoa extends Contato implements Subject {
         return map;
     }
 
-    public void setUId(String UId) {
-        this.UId = UId;
-    }
+
 
 //    public void setNome(String nome) {
 //        this.nome = nome;
@@ -118,14 +113,14 @@ public class Pessoa extends Contato implements Subject {
     }
 
     @Override
-    public void addObserver(Observer observer) {
+    public void addObserver(IObserver observer) {
         observers.add( observer );
     }
 
 
 
     @Override
-    public void removeObserver(Observer observer) {
+    public void removeObserver(IObserver observer) {
         int index = observers.indexOf( observer );
         if( index > -1 ){
             observers.remove( observer );
@@ -134,7 +129,7 @@ public class Pessoa extends Contato implements Subject {
 
     @Override
     public void notifyObservers() {
-        for( Observer o :observers ){
+        for( IObserver o :observers ){
             o.update(this);
         }
     }

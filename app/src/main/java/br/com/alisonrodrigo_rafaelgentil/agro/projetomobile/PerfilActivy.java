@@ -18,16 +18,23 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.Observer;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class PerfilActivy extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, Observer {
+        implements NavigationView.OnNavigationItemSelectedListener, IObserver, IComunicadorInterface {
 
 
     private Pessoa pessoa;
@@ -38,8 +45,15 @@ public class PerfilActivy extends AppCompatActivity
     private Button selectImgButtonHeader;
     private CircleImageView fotoImgViewHeader;
     private  DrawerLayout drawer;
-    Toolbar toolbar;
-    ChatFragment chatFragment;
+//    Toolbar toolbar;
+    private ChatFragment chatFragment;
+    private IFachada fachada;
+//    private List<Conversa> conversas;
+
+    public PerfilActivy() {
+//        this.conversas = new ArrayList<>();
+        chatFragment = new ChatFragment();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +87,7 @@ public class PerfilActivy extends AppCompatActivity
         fotoImgViewHeader = (CircleImageView)headerView.findViewById(R.id.fotoImgView);
         Bundle args = getIntent().getBundleExtra("args");
         pessoa = (Pessoa) args.getSerializable("pessoa");
+        fachada = new Fachada();
         if (pessoa.getNome() != null){
             pessoa.addObserver(this);
             pessoa.notifyObservers();
@@ -89,29 +104,7 @@ public class PerfilActivy extends AppCompatActivity
         fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
         fragmentTransaction.commit ();
 
-
-
-//        chatFragment = new ChatFragment();
-//        map = new HashMap<>();
-//        map.put("pessoa", pessoa);
-//        map.put("drawer_layout", drawer);
-//        chatFragment.responde(map);
-//        fragmentTransaction.replace(R.id.layoutPrincipal, chatFragment);
-//        fragmentTransaction.commit ();
-
-
-//        FragmentManager fragmentManager = getFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-//                ContatoFragment contatoFragment = new ContatoFragment();
-//                Map<String, Object> map1 = new HashMap<>();
-//                map1.put("pessoa", pessoa);
-//                contatoFragment.responde(map1);
-//                fragmentTransaction.replace(R.id.layoutPrincipal, contatoFragment);
-//                fragmentTransaction.commit ();
-
-
     }
-
 
     @Override
     public void onBackPressed() {
@@ -129,29 +122,29 @@ public class PerfilActivy extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-        if (id == R.id.menuItem_Perfil) {
-            perfilFragment = new PerfilFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("pessoa", pessoa);
-            args.putSerializable("nomeButton", MaskEditUtil.EDITAR);
-            perfilFragment.setArguments(args);
-            fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit ();
-        } else if(id == R.id.menuItem_publicacoes){
-            publicacaoFragment = new PublicacoesFragment();
-            fragmentTransaction.replace(R.id.layout_principal, publicacaoFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit ();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
+//        if (id == R.id.menuItem_Perfil) {
+//            perfilFragment = new PerfilFragment();
+//            Bundle args = new Bundle();
+//            args.putSerializable("pessoa", pessoa);
+//            args.putSerializable("nomeButton", MaskEditUtil.EDITAR);
+//            perfilFragment.setArguments(args);
+//            fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
+//            fragmentTransaction.addToBackStack(null);
+//            fragmentTransaction.commit ();
+//        } else if(id == R.id.menuItem_publicacoes){
+//            publicacaoFragment = new PublicacoesFragment();
+//            fragmentTransaction.replace(R.id.layout_principal, publicacaoFragment);
+//            fragmentTransaction.addToBackStack(null);
+//            fragmentTransaction.commit ();
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -165,6 +158,7 @@ public class PerfilActivy extends AppCompatActivity
                 map = new HashMap<>();
                 map.put("nomeButton", MaskEditUtil.EDITAR);
                 map.put("pessoa", pessoa);
+                map.put("fachada", fachada);
                 map.put("drawer_layout", drawer);
                 perfilFragment.responde(map);
                 fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
@@ -184,14 +178,13 @@ public class PerfilActivy extends AppCompatActivity
             case R.id.nav_share:
                 break;
             case R.id.nav_chat:
-                chatFragment = new ChatFragment();
                 map = new HashMap<>();
                 map.put("pessoa", pessoa);
+                map.put("fachada", fachada);
                 map.put("drawer_layout", drawer);
                 chatFragment.responde(map);
                 fragmentTransaction.replace(R.id.layout_principal, chatFragment);
                 fragmentTransaction.commit ();
-
 
                 break;
             case R.id.nav_sair:
@@ -200,7 +193,6 @@ public class PerfilActivy extends AppCompatActivity
                 Intent intent = new Intent(PerfilActivy.this, MainActivity.class);
                 startActivity(intent);
                 break;
-
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -227,5 +219,25 @@ public class PerfilActivy extends AppCompatActivity
                 Picasso.get().load(pessoa.getFotoFileURL()).resize(100, 100).centerCrop().into(fotoImgViewHeader);
             }
         }
+    }
+
+//    public void addConversa(Conversa conversa) {
+//        for (Conversa conversa1: conversas) {
+//            if (!(conversa.getUId().equals(conversa1.getUId()))){
+//                conversas.add( conversa );
+//            }
+//        }
+//    }
+//
+//    public void removeConversa(Conversa conversa) {
+//        int index = conversas.indexOf( conversa );
+//        if( index > -1 ){
+//            conversas.remove( conversa );
+//        }
+//    }
+
+    @Override
+    public void responde(Map<String, Object> map) {
+
     }
 }
