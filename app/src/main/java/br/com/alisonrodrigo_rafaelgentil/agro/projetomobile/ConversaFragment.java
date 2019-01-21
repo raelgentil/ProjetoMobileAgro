@@ -76,15 +76,11 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
                     mensagem.setTexto(texto);
                     mensagem.setRecebida(false);
                     mensagem.setVisualizada(false);
-
                     conversa.addMensagem(mensagem);
                 }
             }
         });
-//        adapter
-//        Log.i("Teste Agora Bora", pessoa.getNome());
-//        buscar();
-//        adapter.add(new ContatoItem(pessoa));
+
         return view;
 
     }
@@ -110,7 +106,6 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
         conversa = (Conversa) map.get("conversa");
         conversa.addObserver(this);
     }
-
 
     public class MensagemItem extends Item<ViewHolder> {
         private  final Mensagem mensagem;
