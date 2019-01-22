@@ -1,5 +1,6 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes;
 
+import android.annotation.SuppressLint;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -24,19 +25,21 @@ public class ContatoDAO implements IContatoDAO {
 
     public void buscar(String busca, final ContatoFragment fragment) {
 //        final Pessoa pessoa = null; //Modificar pra contato
+        final String logTag = "Teste_contatoDAO.buscar()";
         firestore.collection("pessoa").whereEqualTo("login", busca)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @SuppressLint("LongLogTag")
                     @Override
                     public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
                         if (e!=null){
-                            Log.i("TesteContato", e.getMessage(),e);
+                            Log.i(logTag, e.getMessage(),e);
                             return;
                         }
-                        Log.i("TesteContato", "Deu Certo");
+                        Log.i(logTag, "Deu Certo");
                         List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
                         for (DocumentSnapshot doc: docs) {
                             Contato contato = (Contato) doc.toObject(Contato.class);
-                            Log.i("TesteContato", contato.getNome());
+                            Log.i(logTag, contato.getNome());
                             fragment.addItemList(contato);
                         }
 

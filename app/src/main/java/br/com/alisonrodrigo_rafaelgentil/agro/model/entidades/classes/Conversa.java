@@ -15,15 +15,16 @@ public class Conversa implements ISubject {
 
 
     private List<IObserver> observers;
-    List<Mensagem> mensagens;
+    private List<Mensagem> mensagens;
 
     public Conversa() {
         this.observers = new ArrayList<>();
+        this.mensagens = new ArrayList<>();
     }
 
     public Map<String, Object> getMap(){
         Map<String, Object> map = new HashMap<>();
-        map.put("mensagens", getMensagens());
+        map.put("mensagens", getMensagensMap());
         return map;
     }
 
@@ -51,18 +52,23 @@ public class Conversa implements ISubject {
         return UId;
     }
 
+    public List<Mensagem> getMensagens() {
+        return mensagens;
+    }
+
     public void addMensagem(Mensagem mensagem){
         this.mensagens.add(mensagem);
         notifyObservers();
     }
 
-    public List<Map<String, Object>> getMensagens() {
+    public List<Map<String, Object>> getMensagensMap() {
         List<Map<String, Object>> mensagens_maps = new ArrayList<>();
         for (Mensagem mensagem:mensagens) {
             mensagens_maps.add(mensagem.getMap());
         }
         return mensagens_maps;
     }
+
 
     @Override
     public void addObserver(IObserver observer) {

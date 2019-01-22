@@ -1,5 +1,6 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -72,7 +73,9 @@ public class PessoaDAO implements IPessoaDAO {
                             if(task.isSuccessful()){
                                 Log.i("TesteAutenticado", task.getResult().getUser().getUid());
                                 pessoa.getUsuario().setUId(task.getResult().getUser().getUid());
-                                Query querry1 = firestore.collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
+//                                Query querry1 = firestore.collection("pessoa").whereEqualTo("UId", pessoa.getUsuario().getUId());
+
+                                Query querry1 = firestore.collection("pessoa").document(pessoa.getUsuario().getUId()).getParent();
                                 querry1.get()
                                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
@@ -188,9 +191,11 @@ public class PessoaDAO implements IPessoaDAO {
                 });
     }
 
+    @SuppressLint("LongLogTag")
     private void salvarFoto(final Pessoa pessoa, final PerfilFragment fragment) {
-        String fileName = UUID.randomUUID().toString();
-        final StorageReference ref = FirebaseStorage.getInstance().getReference("/images/perfil" + fileName);
+//        String fileName = UUID.randomUUID().toString();
+        Log.i("Teste_PessoaDAO.salvarFoto()", "" + pessoa.getUsuario().getUId());
+        final StorageReference ref = FirebaseStorage.getInstance().getReference("/images/perfil/" + pessoa.getUsuario().getUId());
         ref.putFile(pessoa.getmSelectUri())
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -218,17 +223,17 @@ public class PessoaDAO implements IPessoaDAO {
 
     private void salvarPessoa(final Pessoa pessoa, final PerfilFragment fragment) {
         final Map<String, Object> map = new HashMap<>();
-        FirebaseFirestore.getInstance().collection("pessoa").add(pessoa.getMap())
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        firestore.collection("pessoa").document(pessoa.getUsuario().getUId()).set(pessoa.getMap())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.i("TesteUser", documentReference.getId());
-                        pessoa.setUId(documentReference.getId());
+                    public void onSuccess(Void aVoid) {
+
 //                        Toast.makeText(getContext(),"Usuário salvo com sucesso!", Toast.LENGTH_LONG).show();
                         map.put("mensagem", "Usuário salvo com sucesso!");
                         fragment.responde(map);
                     }
-                }).addOnFailureListener(new OnFailureListener() {
+                })
+               .addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i("Teste", e.getMessage());

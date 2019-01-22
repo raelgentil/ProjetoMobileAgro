@@ -36,7 +36,6 @@ import java.util.Map;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
@@ -90,10 +89,10 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
 
                 ConversarItem conversarItem = (ConversarItem) item;
                 Conversa conversa = conversarItem.conversa;
-                map.put("conversa", conversa);
+//                map.put("conversa", conversa);
 //                conversaFragment.responde(map);
                 for (ConversaFragment fragment:conversasFragments) {
-                    if (fragment.getConversa().getUId().equals(conversa)){
+                    if (fragment.getConversa().getUId().equals(conversa.getUId())){
                         conversaFragment = fragment;
                     }
                 }
@@ -175,7 +174,7 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
         public void bind(@NonNull ViewHolder viewHolder, int position) {
             Log.i("TesteConversa", "Vamos Imprimir ");
             CircleImageView fotoImgView =(CircleImageView)  viewHolder.itemView.findViewById(R.id.fotoImgView);
-            TextView nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.mensagemTView);
+            TextView nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.nomeTView);
             Button b = (Button)viewHolder.itemView.findViewById(R.id.fotoButton);
             if (this.conversa.getContato().getNome()!=null) {
                 nomeUserTView.setText(this.conversa.getContato().getNome());

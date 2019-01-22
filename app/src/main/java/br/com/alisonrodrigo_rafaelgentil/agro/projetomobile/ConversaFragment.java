@@ -3,10 +3,13 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,24 +19,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.xwray.groupie.GroupAdapter;
 import com.xwray.groupie.Item;
 import com.xwray.groupie.ViewHolder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Mensagem;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -43,13 +40,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
  */
 public class ConversaFragment extends Fragment implements IObserver, IComunicadorInterface {
     private GroupAdapter adapter;
-    private Contato contato;
-    private Contato meuContato;
-
     private RecyclerView recyclerView;
     private EditText mensagemText;
     private Button okButton;
     private Conversa conversa;
+    private DrawerLayout drawer;
+    private IFachada fachada;
 
     public ConversaFragment() {
     }
@@ -59,6 +55,18 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_conversa, container, false);
 
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+//        getContext()setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+        activity.getSupportActionBar().setTitle(conversa.getContato().getNome());
+//        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
         mensagemText = view.findViewById(R.id.mensagemText);
         okButton = view.findViewById(R.id.okButton);
         mensagemText.setMovementMethod(new ScrollingMovementMethod());
@@ -66,6 +74,11 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
         adapter = new GroupAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        if (conversa!= null){
+            Log.i("TesteMensagem", "Vou criar observado");
+            conversa.addObserver(this);
+        }
 
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +90,8 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
                     mensagem.setRecebida(false);
                     mensagem.setVisualizada(false);
                     conversa.addMensagem(mensagem);
+                    mensagemText.setText("");
+
                 }
             }
         });
@@ -91,9 +106,10 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
 
     @Override
     public void update(Object observado) {
-        if (observado instanceof Mensagem){
-            Mensagem mensagem = (Mensagem) observado;
-            addMensagem(mensagem);
+        if (observado instanceof Conversa){
+            Log.i("TesteMensagem", "Vou criar");
+            Conversa conversa = (Conversa) observado;
+            addMensagem(conversa.getMensagens().get((conversa.getMensagens().size()-1)));
         }
     }
 
@@ -104,7 +120,9 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
     @Override
     public void responde(Map<String, Object> map) {
         conversa = (Conversa) map.get("conversa");
-        conversa.addObserver(this);
+
+        fachada =(Fachada) map.get("fachada");
+        drawer = (DrawerLayout) map.get("drawer_layout");
     }
 
     public class MensagemItem extends Item<ViewHolder> {
@@ -119,7 +137,7 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
 
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
-            mensagemTView = (TextView) viewHolder.itemView.findViewById(R.id.mensagemTView);
+            mensagemTView = (TextView) viewHolder.itemView.findViewById(R.id.nomeTView);
             dataHoraTView = (TextView) viewHolder.itemView.findViewById(R.id.dataHoraTView);
             if (mensagem.isRecebida()){
                 fotoVisualizaImgView =(CircleImageView)  viewHolder.itemView.findViewById(R.id.fotoVisualizaImgView);
@@ -129,7 +147,7 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
             }
             if (this.mensagem != null) {
                 mensagemTView.setText(mensagem.getTexto());
-                dataHoraTView.setText(mensagem.getData().toString());
+//                dataHoraTView.setText(mensagem.getData().toString());
             }
         }
 

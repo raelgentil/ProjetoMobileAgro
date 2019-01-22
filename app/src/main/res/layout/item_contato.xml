@@ -40,7 +40,7 @@
                 tools:srcCompat="@tools:sample/avatars[8]" />
 
             <TextView
-                android:id="@+id/mensagemTView"
+                android:id="@+id/nomeTView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"

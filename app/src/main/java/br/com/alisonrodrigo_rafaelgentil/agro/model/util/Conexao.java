@@ -7,21 +7,21 @@ import br.com.alisonrodrigo_rafaelgentil.agro.model.business.classes.ContatoBusi
 import br.com.alisonrodrigo_rafaelgentil.agro.model.business.classes.PessoaBusiness;
 
 public class Conexao {
-//    private static FirebaseAuth auth;
-//    private static FirebaseFirestore firestore;
-//
-//    private Conexao() {}
-//
-//    public static FirebaseAuth getFirebaseAuthInstance() {
-//        if (auth == null) {
-//            auth = FirebaseAuth.getInstance();
-//        }
-//        return auth;
-//    }
-//    public static FirebaseFirestore getFirebaseFirestoreInstance() {
-//        if (firestore == null) {
-//            firestore = FirebaseFirestore.getInstance();
-//        }
-//        return firestore;
-//    }
+    private static FirebaseAuth auth;
+    private static FirebaseFirestore firestore;
+
+    private Conexao() {}
+
+    public static FirebaseAuth getFirebaseAuthInstance() {
+        if (auth == null) {
+            auth = FirebaseAuth.getInstance();
+        }
+        return auth;
+    }
+    public static FirebaseFirestore getFirebaseFirestoreInstance() {
+        if (firestore == null) {
+            firestore = FirebaseFirestore.getInstance();
+        }
+        return firestore;
+    }
 }

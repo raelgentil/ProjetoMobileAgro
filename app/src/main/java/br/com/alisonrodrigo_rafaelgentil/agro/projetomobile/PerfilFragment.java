@@ -3,6 +3,7 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -47,6 +49,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
+@SuppressLint("ValidFragment")
 public class PerfilFragment extends Fragment implements IObserver, IComunicadorInterface {
 
     private Pessoa pessoa;
@@ -68,10 +71,15 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
     private IFachada fachada;
 //    private String
 
-    public PerfilFragment() {
-        // Required empty public constructor
-    }
+//    public PerfilFragment() {
+//        // Required empty public constructor
+//    }
 
+    @SuppressLint("ValidFragment")
+    public PerfilFragment(DrawerLayout drawer, IFachada fachada) {
+        this.drawer = drawer;
+        this.fachada = fachada;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -152,7 +160,7 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
                     atualizar();
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
-                    abilitarCampos(true);
+
                     okButton.setText(MaskEditUtil.ATUALIZAR);
                 }
             }
@@ -187,8 +195,7 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
         currentUser.updateEmail(pessoa.getUsuario().getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                FirebaseFirestore.getInstance().collection("pessoa").document(pessoa.getUId()).set(pessoa.getMap());
-
+                fachada.salvarPessoa(pessoa, PerfilFragment.this);
                 Toast.makeText(getContext(),"Usuario atualizado com sucesso!", Toast.LENGTH_LONG).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -223,10 +230,16 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
         loginText.setEnabled(ativar);
         senhaText.setEnabled(ativar);
         selectImgButton.setEnabled(ativar);
+        okButton.setEnabled(ativar);
+        cancelarButton.setEnabled(ativar);
     }
 
     public void setFachada(IFachada fachada) {
         this.fachada = fachada;
+    }
+
+    public void setDrawer(DrawerLayout drawer) {
+        this.drawer = drawer;
     }
 
     private void voltarTelaLogin(){
@@ -236,7 +249,7 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
         loginFragment.setDrawer(drawer);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         fragmentTransaction.replace (R.id.layoutMainPrincipal, loginFragment);
-        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit ();
     }
 
@@ -276,12 +289,17 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void responde(Map<String, Object> map) {
 //        okButton.setText((String)map.get("nomeButton"));
         nomeButton = (String)map.get("nomeButton");
         pessoa = (Pessoa) map.get("pessoa");
         fachada = (Fachada) map.get("fachada");
-        drawer = (DrawerLayout) map.get("drawer_layout");
+//        drawer = (DrawerLayout) map.get("drawer_layout");
         String mensagem = (String)map.get("mensagem");
 
             if (mensagem!= null && mensagem !="") {

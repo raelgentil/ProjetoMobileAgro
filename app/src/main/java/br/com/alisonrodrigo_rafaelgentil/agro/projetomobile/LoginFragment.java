@@ -86,14 +86,15 @@ public class LoginFragment extends Fragment implements IComunicadorInterface {
 
 
     public void abrirCadastro(View v){
-        perfilFragment = new PerfilFragment();
+        perfilFragment = new PerfilFragment(drawer,fachada);
         Map<String, Object> map = new HashMap<>();
         map.put("nomeButton", MaskEditUtil.SALVAR);
         map.put("pessoa", new Pessoa());
         map.put("fachada", fachada);
-        map.put("drawer_layout", drawer);
+//        map.put("drawer_layout", drawer);
         perfilFragment.responde(map);
-        perfilFragment.setFachada(fachada);
+//        perfilFragment.setFachada(fachada);
+//        perfilFragment.setDrawer(drawer);
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         fragmentTransaction.replace (R.id.layoutMainPrincipal, perfilFragment);

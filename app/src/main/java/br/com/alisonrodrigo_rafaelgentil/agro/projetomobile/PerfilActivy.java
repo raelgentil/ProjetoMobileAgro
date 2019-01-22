@@ -52,6 +52,7 @@ public class PerfilActivy extends AppCompatActivity
 
     public PerfilActivy() {
 //        this.conversas = new ArrayList<>();
+        fachada = new Fachada();
         chatFragment = new ChatFragment();
     }
 
@@ -87,7 +88,7 @@ public class PerfilActivy extends AppCompatActivity
         fotoImgViewHeader = (CircleImageView)headerView.findViewById(R.id.fotoImgView);
         Bundle args = getIntent().getBundleExtra("args");
         pessoa = (Pessoa) args.getSerializable("pessoa");
-        fachada = new Fachada();
+
         if (pessoa.getNome() != null){
             pessoa.addObserver(this);
             pessoa.notifyObservers();
@@ -95,12 +96,13 @@ public class PerfilActivy extends AppCompatActivity
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
-        perfilFragment = new PerfilFragment();
+        perfilFragment = new PerfilFragment(drawer, fachada);
         Map<String, Object> map = new HashMap<>();
         map.put("nomeButton", MaskEditUtil.EDITAR);
         map.put("pessoa", pessoa);
-        map.put("drawer_layout", drawer);
+//        map.put("drawer_layout", drawer);
         perfilFragment.responde(map);
+//        perfilFragment.setDrawer(drawer);
         fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
         fragmentTransaction.commit ();
 
@@ -154,12 +156,14 @@ public class PerfilActivy extends AppCompatActivity
         Map<String, Object> map;
         switch (item.getItemId()){
             case R.id.nav_perfil:
-                perfilFragment = new PerfilFragment();
+                perfilFragment = new PerfilFragment(drawer, fachada);
                 map = new HashMap<>();
                 map.put("nomeButton", MaskEditUtil.EDITAR);
                 map.put("pessoa", pessoa);
-                map.put("fachada", fachada);
-                map.put("drawer_layout", drawer);
+//                map.put("fachada", fachada);
+//                map.put("drawer_layout", drawer);
+//                perfilFragment.setDrawer(drawer);
+//                perfilFragment.setFachada(fachada);
                 perfilFragment.responde(map);
                 fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
                 fragmentTransaction.commit ();

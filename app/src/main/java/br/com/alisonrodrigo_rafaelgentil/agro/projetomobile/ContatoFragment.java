@@ -28,11 +28,11 @@ import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
 import com.xwray.groupie.ViewHolder;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
@@ -45,9 +45,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ContatoFragment extends Fragment implements IComunicadorInterface {
 
 private GroupAdapter adapter;
-    private Pessoa pessoa;
-    private DrawerLayout drawer;
+    private Contato meuContato;
     private ConversaFragment conversaFragment;
+    private DrawerLayout drawer;
     private IFachada fachada;
     public ContatoFragment() {
         // Required empty public constructor
@@ -79,6 +79,17 @@ private GroupAdapter adapter;
             @Override
             public void onItemClick(@NonNull Item item, @NonNull View view) {
                 conversaFragment = new ConversaFragment();
+                ContatoItem contatoItem = (ContatoItem) item;
+                Contato contato = contatoItem.contato;
+                Conversa conversa = new Conversa();
+                conversa.setContato(contato);
+                conversa.setMeuContato(meuContato);
+                Map<String, Object> map = new HashMap<>();
+                map.put("fachada", fachada);
+                map.put("drawer_layout", drawer);
+                map.put("conversa", conversa);
+                conversaFragment.responde(map);
+
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
                 fragmentTransaction.replace (R.id.layout_principal, conversaFragment);
@@ -91,10 +102,17 @@ private GroupAdapter adapter;
     }
 
     public void addItemList(Contato contato){
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-            ContatoItem contatoItem = (ContatoItem) adapter.getItem(i);
-            Contato contato1 = contatoItem.contato;
-            if (!(contato1.getUId().equals(contato))){
+        if (!(this.meuContato.getUId().equals(contato.getUId()))){
+            if (adapter.getItemCount()> 0){
+                for (int i = 0; i < adapter.getItemCount(); i++) {
+                    ContatoItem contatoItem = (ContatoItem) adapter.getItem(i);
+                    Contato contato1 = contatoItem.contato;
+                    if (!(contato1.getUId().equals(contato.getUId()))){
+                        adapter.add(new ContatoItem(contato));
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }else{
                 adapter.add(new ContatoItem(contato));
                 adapter.notifyDataSetChanged();
             }
@@ -105,7 +123,6 @@ private GroupAdapter adapter;
 
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
-
         getActivity().getMenuInflater().inflate(R.menu.contato_activy, menu);
         SearchView searchView = (SearchView) menu.findItem(R.id.menuItem_contato_buscar).getActionView();
         searchView.setOnQueryTextListener(new SearchFiltro());
@@ -118,7 +135,7 @@ private GroupAdapter adapter;
 
     @Override
     public void responde(Map<String, Object> map) {
-        pessoa =(Pessoa) map.get("pessoa");
+        meuContato =(Contato) map.get("meuContato");
         fachada =(Fachada) map.get("fachada");
         drawer = (DrawerLayout) map.get("drawer_layout");
     }
@@ -137,7 +154,7 @@ private GroupAdapter adapter;
         public void bind(@NonNull ViewHolder viewHolder, int position) {
             Log.i("TesteContato", "Deu ceto tb");
             fotoImgView =(CircleImageView)  viewHolder.itemView.findViewById(R.id.fotoImgView);
-            nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.mensagemTView);
+            nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.nomeTView);
             Button b = (Button)viewHolder.itemView.findViewById(R.id.fotoButton);
             if (this.contato.getNome()!=null) {
                 nomeUserTView.setText(this.contato.getNome());

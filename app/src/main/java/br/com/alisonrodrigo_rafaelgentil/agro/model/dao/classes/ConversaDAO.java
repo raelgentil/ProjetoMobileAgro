@@ -27,6 +27,7 @@ public class ConversaDAO {
     FirebaseAuth auth;
     FirebaseFirestore firestore;
 
+
     public ConversaDAO(FirebaseAuth auth, FirebaseFirestore firestore) {
         this.auth = auth;
         this.firestore = firestore;
@@ -34,7 +35,7 @@ public class ConversaDAO {
 
     public void salvar(final Conversa conversa, final PerfilFragment fragment) {
         final Map<String, Object> map = new HashMap<>();
-        firestore.collection("conversas").add(conversa.getMap())
+        firestore.collection("conversas").document().collection(conversa.getMeuContato().getUId()).add(conversa.getMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @SuppressLint("LongLogTag")
                     @Override
