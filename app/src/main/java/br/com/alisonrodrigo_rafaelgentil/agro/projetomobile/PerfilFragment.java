@@ -17,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -124,6 +125,9 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
             pessoa.addObserver(this);
             pessoa.notifyObservers();
         }
+        if (okButton.getText().toString().equals(MaskEditUtil.ATUALIZAR)){
+            abilitarCampos(false);
+        }
 
         selectImgButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +144,6 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.ATUALIZAR)){
                     abilitarCampos(false);
-                    okButton.setText(MaskEditUtil.EDITAR);
                 }
             }
         });
@@ -153,16 +156,16 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
                     pegarDadosTela();
                     abilitarCampos(false);
 //                    PessoaDAO p = new PessoaDAO();
-//                    p.salvar(pessoa, PerfilFragment.this);
+//                    p.salvarOuAtualizar(pessoa, PerfilFragment.this);
                     fachada.salvarPessoa(pessoa, PerfilFragment.this);
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.ATUALIZAR)){
                     atualizar();
                 }
-                if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
-
-                    okButton.setText(MaskEditUtil.ATUALIZAR);
-                }
+//                if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
+//
+//                    okButton.setText(MaskEditUtil.ATUALIZAR);
+//                }
             }
         });
 
@@ -180,7 +183,6 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        System.out.println("Vou Imprimir o ResultCode: " + resultCode);
         if (requestCode == 0 && data != null){
 //            mSelectUri = data.getData();
             pessoa.setmSelectUri(data.getData());
@@ -191,20 +193,25 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
 
     private void atualizar(){
         pegarDadosTela();
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        currentUser.updateEmail(pessoa.getUsuario().getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                fachada.salvarPessoa(pessoa, PerfilFragment.this);
-                Toast.makeText(getContext(),"Usuario atualizado com sucesso!", Toast.LENGTH_LONG).show();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getContext(),"Erro ao atualizar Usuario!", Toast.LENGTH_LONG).show();
-            }
-        });
-        currentUser.updatePassword(pessoa.getUsuario().getSenha());
+        fachada.salvarPessoa(pessoa, PerfilFragment.this);
+        Toast.makeText(getContext(),"Usuario atualizado com sucesso!", Toast.LENGTH_LONG).show();
+//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+//        currentUser.updateEmail(pessoa.getUsuario().getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Void> task) {
+//
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(getContext(),"Erro ao atualizar Usuario!", Toast.LENGTH_LONG).show();
+//            }
+//        });
+//        if (pessoa.getUsuario().getSenha() != null && pessoa.getUsuario().getSenha()!= ""){
+//            Log.i("TesteAtualizar :", pessoa.getUsuario().getSenha() );
+//            currentUser.updatePassword(pessoa.getUsuario().getSenha());
+//        }
+
 
 
     }
@@ -234,13 +241,13 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
         cancelarButton.setEnabled(ativar);
     }
 
-    public void setFachada(IFachada fachada) {
-        this.fachada = fachada;
-    }
-
-    public void setDrawer(DrawerLayout drawer) {
-        this.drawer = drawer;
-    }
+//    public void setFachada(IFachada fachada) {
+//        this.fachada = fachada;
+//    }
+//
+//    public void setDrawer(DrawerLayout drawer) {
+//        this.drawer = drawer;
+//    }
 
     private void voltarTelaLogin(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
@@ -257,9 +264,9 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
     public void update(Object observado) {
         pessoa = (Pessoa) observado;
         if (pessoa != null){
-            if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
-                abilitarCampos(false);
-            }
+//            if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
+//                abilitarCampos(false);
+//            }
             nomeText.setText(pessoa.getNome());
             cpfText.setText(pessoa.getCpf());
             emailText.setText(pessoa.getUsuario().getEmail());
@@ -290,16 +297,18 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        abilitarCampos(true);
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void responde(Map<String, Object> map) {
-//        okButton.setText((String)map.get("nomeButton"));
+
         nomeButton = (String)map.get("nomeButton");
         pessoa = (Pessoa) map.get("pessoa");
-        fachada = (Fachada) map.get("fachada");
-//        drawer = (DrawerLayout) map.get("drawer_layout");
+
         String mensagem = (String)map.get("mensagem");
 
             if (mensagem!= null && mensagem !="") {

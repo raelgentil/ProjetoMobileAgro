@@ -14,7 +14,7 @@ public abstract class MaskEditUtil {
 
     public static final String SALVAR = "Salvar";
     public static final String ATUALIZAR = "Atulizar";
-    public static final String EDITAR = "Editar";
+//    public static final String EDITAR = "Editar";
 
 
     /**

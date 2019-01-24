@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -98,9 +99,11 @@ public class PerfilActivy extends AppCompatActivity
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
         perfilFragment = new PerfilFragment(drawer, fachada);
         Map<String, Object> map = new HashMap<>();
-        map.put("nomeButton", MaskEditUtil.EDITAR);
+
         map.put("pessoa", pessoa);
+        map.put("nomeButton", MaskEditUtil.ATUALIZAR);
 //        map.put("drawer_layout", drawer);
+        Log.i("TesteButton", (String)(map.get("nomeButton")));
         perfilFragment.responde(map);
 //        perfilFragment.setDrawer(drawer);
         fragmentTransaction.replace(R.id.layout_principal, perfilFragment);
@@ -158,7 +161,7 @@ public class PerfilActivy extends AppCompatActivity
             case R.id.nav_perfil:
                 perfilFragment = new PerfilFragment(drawer, fachada);
                 map = new HashMap<>();
-                map.put("nomeButton", MaskEditUtil.EDITAR);
+                map.put("nomeButton", MaskEditUtil.ATUALIZAR);
                 map.put("pessoa", pessoa);
 //                map.put("fachada", fachada);
 //                map.put("drawer_layout", drawer);

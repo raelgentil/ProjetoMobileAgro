@@ -1,6 +1,7 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -38,6 +39,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
+@SuppressLint("ValidFragment")
 public class ConversaFragment extends Fragment implements IObserver, IComunicadorInterface {
     private GroupAdapter adapter;
     private RecyclerView recyclerView;
@@ -47,7 +49,16 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
     private DrawerLayout drawer;
     private IFachada fachada;
 
-    public ConversaFragment() {
+//    public ConversaFragment() {
+//    }
+
+    @SuppressLint("ValidFragment")
+    public ConversaFragment(Conversa conversa, DrawerLayout drawer, IFachada fachada) {
+        this.conversa = conversa;
+        this.conversa.addObserver(this);
+
+        this.drawer = drawer;
+        this.fachada = fachada;
     }
 
     @Override
@@ -75,11 +86,8 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        if (conversa!= null){
-            Log.i("TesteMensagem", "Vou criar observado");
-            conversa.addObserver(this);
-        }
 
+        fachada.receberMensagens(conversa);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,8 +97,10 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
                     mensagem.setTexto(texto);
                     mensagem.setRecebida(false);
                     mensagem.setVisualizada(false);
-                    conversa.addMensagem(mensagem);
+                    conversa.getMeuContato().addMensagem(mensagem);
                     mensagemText.setText("");
+                    drawer.setFocusable(true);
+                    fachada.salvarConersa(conversa, mensagem);
 
                 }
             }
@@ -106,10 +116,12 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
 
     @Override
     public void update(Object observado) {
-        if (observado instanceof Conversa){
-            Log.i("TesteMensagem", "Vou criar");
-            Conversa conversa = (Conversa) observado;
-            addMensagem(conversa.getMensagens().get((conversa.getMensagens().size()-1)));
+        if (observado instanceof Contato){
+            Log.i("TesteMensagem", "Vou criar a mensagem");
+            Contato contato = (Contato) observado;
+            addMensagem(contato.getMensagens().get((contato.getMensagens().size()-1)));
+        }if (observado instanceof Conversa){
+            this.conversa = (Conversa)observado;
         }
     }
 
@@ -117,12 +129,13 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
         adapter.add(new MensagemItem(mensagem));
     }
 
+
     @Override
     public void responde(Map<String, Object> map) {
-        conversa = (Conversa) map.get("conversa");
-
-        fachada =(Fachada) map.get("fachada");
-        drawer = (DrawerLayout) map.get("drawer_layout");
+//        conversa = (Conversa) map.get("conversa");
+//
+//        fachada =(Fachada) map.get("fachada");
+//        drawer = (DrawerLayout) map.get("drawer_layout");
     }
 
     public class MensagemItem extends Item<ViewHolder> {

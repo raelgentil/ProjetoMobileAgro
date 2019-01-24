@@ -78,17 +78,21 @@ private GroupAdapter adapter;
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull Item item, @NonNull View view) {
-                conversaFragment = new ConversaFragment();
+
                 ContatoItem contatoItem = (ContatoItem) item;
                 Contato contato = contatoItem.contato;
                 Conversa conversa = new Conversa();
+                if (meuContato.getUIdchats()!=null && !(meuContato.getUIdchats().isEmpty())){
+                    conversa.setUId(meuContato.getUIdchats().get(0));
+                }
                 conversa.setContato(contato);
                 conversa.setMeuContato(meuContato);
-                Map<String, Object> map = new HashMap<>();
-                map.put("fachada", fachada);
-                map.put("drawer_layout", drawer);
-                map.put("conversa", conversa);
-                conversaFragment.responde(map);
+                conversaFragment = new ConversaFragment(conversa, drawer, fachada);
+//                Map<String, Object> map = new HashMap<>();
+//                map.put("fachada", fachada);
+//                map.put("drawer_layout", drawer);
+//                map.put("conversa", conversa);
+//                conversaFragment.responde(map);
 
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();

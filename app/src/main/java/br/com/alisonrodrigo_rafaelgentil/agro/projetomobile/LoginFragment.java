@@ -26,6 +26,7 @@ import java.util.Map;
 
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
@@ -34,7 +35,7 @@ import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunica
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginFragment extends Fragment implements IComunicadorInterface {
+public class LoginFragment extends Fragment implements IComunicadorInterface, IObserver {
 
     private TextView cadastroTView;
     private Button okButton;
@@ -77,8 +78,10 @@ public class LoginFragment extends Fragment implements IComunicadorInterface {
 //                autenticar(u);
 //                PessoaDAO pessoaDAO = new PessoaDAO();
 //                pessoaDAO.autenticar(u, );
-
-                fachada.autenticarUsuario(u,LoginFragment.this);
+                Pessoa pessoa = new Pessoa();
+                pessoa.setUsuario(u);
+                pessoa.addObserver(LoginFragment.this);
+                fachada.autenticarUsuario(pessoa);
                 }
         });
         return view;
@@ -119,16 +122,6 @@ public class LoginFragment extends Fragment implements IComunicadorInterface {
 
     public void setDrawer(DrawerLayout drawer) {
         this.drawer = drawer;
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isSenhaValid(String senha) {
-        //TODO: Replace this with your own logic
-        return senha.length() > 5;
     }
 
     /**
@@ -178,4 +171,18 @@ public class LoginFragment extends Fragment implements IComunicadorInterface {
     }
 
 
+    @Override
+    public void update(Object observado) {
+        if (observado instanceof Pessoa){
+            Pessoa pessoa = (Pessoa) observado;
+            Map<String, Object> map = new HashMap<>();
+            pessoa.removeObserver(LoginFragment.this);
+            map.put("pessoa", pessoa);
+            iComunicadorInterface.responde(map);
+
+            showProgress(false);
+            okButton.setEnabled(true);
+            cadastroTView.setEnabled(true);
+        }
+    }
 }

@@ -80,7 +80,7 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-
+//        fachada.
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull Item item, @NonNull View view) {
@@ -88,11 +88,11 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
                 Map<String, Object> map = new HashMap<>();
 
                 ConversarItem conversarItem = (ConversarItem) item;
-                Conversa conversa = conversarItem.conversa;
+                Contato contato = conversarItem.contato;
 //                map.put("conversa", conversa);
 //                conversaFragment.responde(map);
                 for (ConversaFragment fragment:conversasFragments) {
-                    if (fragment.getConversa().getUId().equals(conversa.getUId())){
+                    if (fragment.getConversa().getContato().getUId().equals(contato.getUId())){
                         conversaFragment = fragment;
                     }
                 }
@@ -145,12 +145,12 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
 
     }
 
-    public void addItemList(Conversa conversa){
+    public void addItemList(Contato contato){
         for (int i = 0; i < adapter.getItemCount(); i++) {
             ConversarItem conversarItem = (ConversarItem) adapter.getItem(i);
-            Conversa conversa1 = conversarItem.conversa;
-            if (!(conversa1.getUId().equals(conversa))){
-                adapter.add(new ConversarItem(conversa));
+            Contato contato1 = conversarItem.contato;
+            if (!(contato.getUId().equals(contato1.getUId()))){
+                adapter.add(new ConversarItem(contato));
                 adapter.notifyDataSetChanged();
             }
         }
@@ -164,10 +164,12 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
 
     public class ConversarItem extends Item<ViewHolder> {
 //        private  final Contato contato;
-        private  final Conversa conversa;
+        private  final Contato contato;
+//        private  final Contato meuContato;
 
-        public ConversarItem(Conversa conversa) {
-            this.conversa = conversa;
+        public ConversarItem(Contato contato) {
+            this.contato = contato;
+//            this.meuContato = meuContato;
         }
 
         @Override
@@ -176,13 +178,13 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
             CircleImageView fotoImgView =(CircleImageView)  viewHolder.itemView.findViewById(R.id.fotoImgView);
             TextView nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.nomeTView);
             Button b = (Button)viewHolder.itemView.findViewById(R.id.fotoButton);
-            if (this.conversa.getContato().getNome()!=null) {
-                nomeUserTView.setText(this.conversa.getContato().getNome());
-                if (this.conversa.getContato().getFotoFileURL() == null || this.conversa.getContato().getFotoFileURL() ==""){
+            if (this.contato.getNome()!=null) {
+                nomeUserTView.setText(this.contato.getNome());
+                if (this.contato.getFotoFileURL() == null || this.contato.getFotoFileURL() ==""){
                     b.setAlpha(1);
                 }else{
                     b.setAlpha(0);
-                    Picasso.get().load(this.conversa.getContato().getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
+                    Picasso.get().load(this.contato.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
                 }
             }
         }

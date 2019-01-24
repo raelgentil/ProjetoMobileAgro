@@ -5,6 +5,9 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import br.com.alisonrodrigo_rafaelgentil.agro.model.business.interfaces.IPessoaBusiness;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.classes.PessoaDAO;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.dao.interfaces.IPessoaDAO;
@@ -22,13 +25,41 @@ public class PessoaBusiness implements IPessoaBusiness {
     }
 
     @Override
-    public boolean autenticar(Usuario usuario, LoginFragment fragment) {
-        return pessoaDAO.autenticar(usuario, fragment);
+    public boolean autenticar(final Pessoa pessoa) {
+
+        if (isEmailValid(pessoa.getUsuario().getEmail()) && isSenhaValid(pessoa.getUsuario().getSenha())){
+            return pessoaDAO.autenticar(pessoa);
+        }else{
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("show", true);
+//            map.put("mensagem", "E-mail ou senha incorreto");
+//            fragment.responde(map);
+//            Toast.makeText(fragment.getContext().getApplicationContext(), "E-mail ou senha incorreto" , Toast.LENGTH_LONG).show();
+//            showProgress(false);
+//            okButton.setEnabled(true);
+//            cadastroTView.setEnabled(true);
+            return false;
+        }
+    }
+    private boolean isEmailValid(String email) {
+        //TODO: Replace this with your own logic
+        return email.contains("@");
+    }
+
+    private boolean isSenhaValid(String senha) {
+        //TODO: Replace this with your own logic
+        return senha.length() > 5;
     }
 
     @Override
     public void salvar(Pessoa pessoa, PerfilFragment fragment) {
-        pessoaDAO.salvar(pessoa,fragment);
+        if (pessoa.getUsuario().getUId()!=null & pessoa.getUsuario().getUId()!=""){
+            pessoaDAO.atualizar(pessoa, fragment);
+        }else{
+
+            pessoaDAO.salvar(pessoa,fragment);
+        }
+
     }
 
     @Override

@@ -8,7 +8,8 @@ import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.PerfilFragment;
 
 public interface IPessoaBusiness {
 
-    public boolean autenticar(Usuario usuario, final LoginFragment fragment);
+    public boolean autenticar(final Pessoa pessoa);
+//    public boolean autenticar(Usuario usuario, final LoginFragment fragment);
     public void salvar(final Pessoa pessoa, final PerfilFragment fragment);
     public boolean verificarUserLogado(Pessoa pessoa);
 

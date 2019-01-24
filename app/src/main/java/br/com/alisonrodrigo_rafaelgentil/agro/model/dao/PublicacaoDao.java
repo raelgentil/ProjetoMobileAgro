@@ -34,8 +34,8 @@ public class PublicacaoDao {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.i("Teste", e.getMessage());
-//                Toast.makeText(getContext(),"Erro ao salvar Usuario!", Toast.LENGTH_LONG).show();
-                map.put("mensagem", "Erro ao salvar Usuario!");
+//                Toast.makeText(getContext(),"Erro ao salvarOuAtualizar Usuario!", Toast.LENGTH_LONG).show();
+                map.put("mensagem", "Erro ao salvarOuAtualizar Usuario!");
 
             }
         });

@@ -23,9 +23,9 @@ public class Pessoa extends Contato implements ISubject {
 //    private String fotoFileURL;
     private Uri mSelectUri;
     private Usuario usuario;
-    private List<String> UIdchats;
 
-    public Pessoa() {this.observers = new ArrayList<>(); this.usuario = new Usuario(); this.UIdchats = new ArrayList<>();}
+
+    public Pessoa() {this.observers = new ArrayList<>(); this.usuario = new Usuario(); }
 
 
 
@@ -61,9 +61,7 @@ public class Pessoa extends Contato implements ISubject {
         return mSelectUri;
     }
 
-    public List<String> getUIdchats() {
-        return UIdchats;
-    }
+
 
     public Map<String, Object> getMap(){
         Map<String, Object> map = new HashMap<>();
@@ -83,6 +81,9 @@ public class Pessoa extends Contato implements ISubject {
 //    public void setNome(String nome) {
 //        this.nome = nome;
 //    }
+
+
+
 
     public void setCpf(String cpf) {
         Cpf = cpf;
@@ -135,7 +136,7 @@ public class Pessoa extends Contato implements ISubject {
     }
 
     public void addchats(String UId) {
-        UIdchats.add( UId );
+        getUIdchats().add( UId );
     }
 
     public void removeChat(String UId) {
