@@ -4,6 +4,8 @@ package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +39,7 @@ public class PublicacoesUser extends Fragment {
     private PublicacaoDao publicacaoDao;
     private SimpleDateFormat formataData = new SimpleDateFormat("dd-MM-yyyy");
     private Date data;
+    private PublicacoesFragment publicacoesFragment;
     public PublicacoesUser() {
         // Required empty public constructor
     }
@@ -65,6 +68,7 @@ public class PublicacoesUser extends Fragment {
             publicacao.setData_publicacao(dataFormatada);
 
             publicacaoDao.salvarPublicao(publicacao);
+
         }
     });
 

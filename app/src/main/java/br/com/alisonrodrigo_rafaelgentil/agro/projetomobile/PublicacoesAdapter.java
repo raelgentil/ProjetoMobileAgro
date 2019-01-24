@@ -40,8 +40,8 @@ public class PublicacoesAdapter extends ArrayAdapter<Publicacao> {
 
             Publicacao publicacao1 = publicacao.get(position);
 
-            textView_descricao.setText(publicacao1.getDescricao().toString());
-            textView_data.setText(publicacao1.getData_publicacao().toString());
+            textView_descricao.setText("Descrição: "+publicacao1.getDescricao().toString());
+            textView_data.setText("Data: "+publicacao1.getData_publicacao().toString());
         }
 
        return  view;
