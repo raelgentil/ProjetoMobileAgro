@@ -17,5 +17,6 @@ public interface IFachada extends Serializable {
     public void buscarContatos(String busca, final ContatoFragment fragment);
     public void receberMensagens(final Conversa conversa);
 
+
     public void salvarConersa(Conversa conversa, Mensagem mensagem);
 }

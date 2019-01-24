@@ -30,5 +30,9 @@ public class ConversaBusiness implements IConversaBusiness {
         conversaDAO.receberDados(conversa);
     }
 
+    public void pegarDadosConversa(final Conversa conversa){
+        conversaDAO.pegarDadosConversa(conversa);
+    }
+
 
 }

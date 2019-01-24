@@ -275,7 +275,7 @@ public class ConversaDAO implements IConversaDAO {
         }
     }
 
-    public void pegarDadosPessoa(final Conversa conversa) {
+    public void pegarDadosConversa(final Conversa conversa) {
         Query querry1 = firestore.collection("conversas").document(conversa.getUId()).collection("dados").document().getParent();
 //        Query querry1 = firestore.collection("pessoa").document(pessoa.getUsuario().getUId()).collection("dados").whereEqualTo("UId", pessoa.getUsuario().getUId());
         querry1.get()
@@ -287,7 +287,12 @@ public class ConversaDAO implements IConversaDAO {
                                 Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
                                 List<Contato> contatoes = (List<Contato>) document.get("contatos");
                                 if (contatoes!=null){
-//                                    contatoes.get(0).equals()
+                                    if (contatoes.get(0).getUId().equals(conversa.getMeuContato().getUId())){
+                                        conversa.setContato(contatoes.get(0));
+                                    }else{
+                                        conversa.setContato(contatoes.get(0));
+                                    }
+                                    conversa.notifyObservers();
                                 }
                             }
                         }
