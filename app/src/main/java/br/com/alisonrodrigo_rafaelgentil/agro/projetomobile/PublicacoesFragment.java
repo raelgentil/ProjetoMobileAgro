@@ -79,6 +79,7 @@ public class PublicacoesFragment extends Fragment {
 
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 publicacoesUser = new PublicacoesUser();
+
                 fragmentManager.beginTransaction().replace(R.id.layout_principal, publicacoesUser).commit();
             }
 
@@ -95,14 +96,18 @@ public class PublicacoesFragment extends Fragment {
             public void onEvent(QuerySnapshot DocumentSnapshots, FirebaseFirestoreException e) {
                 for(DocumentChange dc: DocumentSnapshots.getDocumentChanges()){
                     if(dc.getType() == DocumentChange.Type.ADDED){
+
                         Publicacao publicacoesNovas = dc.getDocument().toObject(Publicacao.class);
+
                         publicacoes.add(publicacoesNovas);
+
 
                     }
                     adapterPublicacoes.notifyDataSetChanged();
                 }
             }
         });
+
 
     }
 
@@ -112,11 +117,13 @@ public class PublicacoesFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 publicacoes.clear();
 
+
                 for(DataSnapshot dados: dataSnapshot.getChildren()){
 
                     Publicacao publicacoesNovas = dados.getValue(Publicacao.class);
 
                     publicacoes.add(publicacoesNovas);
+
 
                 }
                 adapterPublicacoes.notifyDataSetChanged();
@@ -125,7 +132,9 @@ public class PublicacoesFragment extends Fragment {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+
             }
+
         };
 
     }

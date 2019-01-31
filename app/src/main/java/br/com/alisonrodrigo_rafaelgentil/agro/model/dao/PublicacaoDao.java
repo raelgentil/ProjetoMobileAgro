@@ -20,7 +20,9 @@ public class PublicacaoDao {
     }
 
     public void salvarPublicao(Publicacao publicacao) {
+
         final Map<String, Object> map = new HashMap<>();
+
         FirebaseFirestore.getInstance().collection("publicacao").add(publicacao.getMap())
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -29,11 +31,14 @@ public class PublicacaoDao {
 //                        Toast.makeText(getContext(),"Usuário salvo com sucesso!", Toast.LENGTH_LONG).show();
                         map.put("mensagem", "Usuário salvo com sucesso!");
 
+
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+
                 Log.i("Teste", e.getMessage());
+
 //                Toast.makeText(getContext(),"Erro ao salvarOuAtualizar Usuario!", Toast.LENGTH_LONG).show();
                 map.put("mensagem", "Erro ao salvarOuAtualizar Usuario!");
 
