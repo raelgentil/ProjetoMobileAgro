@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements IComunicadorInter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        drawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
 
         fachada = new Fachada();
         pessoa = new Pessoa();
