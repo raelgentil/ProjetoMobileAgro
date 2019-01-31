@@ -29,8 +29,7 @@ public class Fachada implements IFachada, Serializable{
     private IConversaBusiness conversaBusiness;
 
     public Fachada() {
-        auth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference conexao = database.getReference();
         this.pessoaBusiness = new PessoaBusiness(auth, firestore);
