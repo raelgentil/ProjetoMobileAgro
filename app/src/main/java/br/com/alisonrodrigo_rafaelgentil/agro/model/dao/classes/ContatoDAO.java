@@ -71,6 +71,8 @@ public class ContatoDAO implements IContatoDAO {
                                 Log.i("TestePegarDados", document.getId()+ " =>>>>>>>>> " + document.get("nome").toString()+ " => " + document.getData());
                                 Log.i(logTag, "Procurando contato");
                                 Contato contato = (Contato) document.toObject(Contato.class);
+                                contato.setUId(document.getId());
+                                Log.i(logTag, "Procurando contato" + contato.getUId());
 //                                Contato contato = (Contato) doc.toObject(Contato.class);
                                 Log.i(logTag, contato.getNome());
                                 fragment.addItemList(contato);

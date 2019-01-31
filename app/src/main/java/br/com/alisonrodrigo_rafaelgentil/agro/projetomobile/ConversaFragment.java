@@ -56,7 +56,6 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
     public ConversaFragment(Conversa conversa, DrawerLayout drawer, IFachada fachada) {
         this.conversa = conversa;
         this.conversa.addObserver(this);
-
         this.drawer = drawer;
         this.fachada = fachada;
     }
@@ -77,7 +76,7 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
+        fachada.pegarConversa(conversa);
         mensagemText = view.findViewById(R.id.mensagemText);
         okButton = view.findViewById(R.id.okButton);
         mensagemText.setMovementMethod(new ScrollingMovementMethod());
@@ -87,7 +86,7 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-        fachada.receberMensagens(conversa);
+//        fachada.receberMensagens(conversa);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,7 +96,7 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
                     mensagem.setTexto(texto);
                     mensagem.setRecebida(false);
                     mensagem.setVisualizada(false);
-                    conversa.getMeuContato().addMensagem(mensagem);
+//                    conversa.getMeuContato().addMensagem(mensagem);
                     mensagemText.setText("");
                     drawer.setFocusable(true);
                     fachada.salvarConersa(conversa, mensagem);
@@ -119,9 +118,10 @@ public class ConversaFragment extends Fragment implements IObserver, IComunicado
         if (observado instanceof Contato){
             Log.i("TesteMensagem", "Vou criar a mensagem");
             Contato contato = (Contato) observado;
-            addMensagem(contato.getMensagens().get((contato.getMensagens().size()-1)));
+
         }if (observado instanceof Conversa){
             this.conversa = (Conversa)observado;
+            addMensagem(conversa.getMensagens().get((conversa.getMensagens().size()-1)));
         }
     }
 

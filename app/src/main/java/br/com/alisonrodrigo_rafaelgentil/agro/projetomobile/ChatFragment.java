@@ -1,6 +1,7 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -28,15 +29,14 @@ import com.xwray.groupie.Item;
 import com.xwray.groupie.OnItemClickListener;
 import com.xwray.groupie.ViewHolder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Chat;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Contato;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.Fachada;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.interfaces.IObserver;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.fachada.IFachada;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.interfaces.IComunicadorInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -45,17 +45,24 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatFragment extends Fragment implements IComunicadorInterface {
+@SuppressLint("ValidFragment")
+public class ChatFragment extends Fragment implements IComunicadorInterface, IObserver {
     private GroupAdapter adapter;
     private Contato meuContato;
     private ContatoFragment contatoFragment;
     private ConversaFragment conversaFragment;
     private  DrawerLayout drawer;
     private IFachada fachada;
-    private List<ConversaFragment> conversasFragments;
-    public ChatFragment() {
+    private Chat chat;
+    public ChatFragment(DrawerLayout drawer, IFachada fachada) {
+        this.drawer = drawer;
+        this.fachada = fachada;
         this.adapter = new GroupAdapter();
-        this.conversasFragments = new ArrayList<>();
+        this.fachada.pegarConversas(this);
+        this.chat = new Chat();
+        this.chat.addObserver(this);
+
+
     }
 
     @Override
@@ -73,8 +80,8 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
                 getActivity(), drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-
+        this.chat.setMeu_contato(meuContato);
+        fachada.listarConversas(chat);
 //
         RecyclerView recyclerView = (RecyclerView)view.findViewById(R.id.recycler_view);
 
@@ -86,16 +93,9 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
             public void onItemClick(@NonNull Item item, @NonNull View view) {
 //                conversaFragment = new ConversaFragment();
                 Map<String, Object> map = new HashMap<>();
-
                 ConversarItem conversarItem = (ConversarItem) item;
-                Contato contato = conversarItem.contato;
-//                map.put("conversa", conversa);
-//                conversaFragment.responde(map);
-                for (ConversaFragment fragment:conversasFragments) {
-                    if (fragment.getConversa().getContato().getUId().equals(contato.getUId())){
-                        conversaFragment = fragment;
-                    }
-                }
+                Conversa conversa = conversarItem.conversa;
+                conversaFragment = new ConversaFragment(conversa,drawer, fachada);
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction ();
                 fragmentTransaction.replace (R.id.layout_principal, conversaFragment);
@@ -140,17 +140,16 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
     @Override
     public void responde(Map<String, Object> map) {
         meuContato =(Pessoa) map.get("pessoa");
-        drawer = (DrawerLayout) map.get("drawer_layout");
-        fachada = (Fachada) map.get("fachada");
+
 
     }
 
-    public void addItemList(Contato contato){
+    public void addItemList(Conversa conversa){
         for (int i = 0; i < adapter.getItemCount(); i++) {
             ConversarItem conversarItem = (ConversarItem) adapter.getItem(i);
-            Contato contato1 = conversarItem.contato;
-            if (!(contato.getUId().equals(contato1.getUId()))){
-                adapter.add(new ConversarItem(contato));
+            Conversa conversa11 = conversarItem.conversa;
+            if (!(conversa.getUId().equals(conversa11.getUId()))){
+                adapter.add(new ConversarItem(conversa));
                 adapter.notifyDataSetChanged();
             }
         }
@@ -162,15 +161,24 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
         }
     }
 
+    @Override
+    public void update(Object observado) {
+        if (observado instanceof Chat){
+            this.chat = (Chat) observado;
+            addItemList(chat.getConversas().get(chat.getConversas().size()-1));
+        }
+    }
+
     public class ConversarItem extends Item<ViewHolder> {
 //        private  final Contato contato;
-        private  final Contato contato;
+//        private  final Contato contato;
+        private final Conversa conversa;
+
+        public ConversarItem(Conversa conversa) {
+            this.conversa = conversa;
+        }
 //        private  final Contato meuContato;
 
-        public ConversarItem(Contato contato) {
-            this.contato = contato;
-//            this.meuContato = meuContato;
-        }
 
         @Override
         public void bind(@NonNull ViewHolder viewHolder, int position) {
@@ -178,13 +186,13 @@ public class ChatFragment extends Fragment implements IComunicadorInterface {
             CircleImageView fotoImgView =(CircleImageView)  viewHolder.itemView.findViewById(R.id.fotoImgView);
             TextView nomeUserTView = (TextView) viewHolder.itemView.findViewById(R.id.nomeTView);
             Button b = (Button)viewHolder.itemView.findViewById(R.id.fotoButton);
-            if (this.contato.getNome()!=null) {
-                nomeUserTView.setText(this.contato.getNome());
-                if (this.contato.getFotoFileURL() == null || this.contato.getFotoFileURL() ==""){
+            if (this.conversa.getContato().getNome()!=null) {
+                nomeUserTView.setText(this.conversa.getContato().getNome());
+                if (this.conversa.getContato().getFotoFileURL() == null || this.conversa.getContato().getFotoFileURL() ==""){
                     b.setAlpha(1);
                 }else{
                     b.setAlpha(0);
-                    Picasso.get().load(this.contato.getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
+                    Picasso.get().load(this.conversa.getContato().getFotoFileURL()).resize(350, 350).centerCrop().into(fotoImgView);
                 }
             }
         }

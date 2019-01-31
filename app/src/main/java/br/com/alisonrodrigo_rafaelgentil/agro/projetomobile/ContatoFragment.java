@@ -1,6 +1,7 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.projetomobile;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -82,11 +83,12 @@ private GroupAdapter adapter;
                 ContatoItem contatoItem = (ContatoItem) item;
                 Contato contato = contatoItem.contato;
                 Conversa conversa = new Conversa();
-                if (meuContato.getUIdchats()!=null && !(meuContato.getUIdchats().isEmpty())){
-                    conversa.setUId(meuContato.getUIdchats().get(0));
-                }
+//                if (meuContato.getUIdchats()!=null && !(meuContato.getUIdchats().isEmpty())){
+//                    conversa.setUId(meuContato.getUIdchats().get(0));
+//                }
                 conversa.setContato(contato);
                 conversa.setMeuContato(meuContato);
+
                 conversaFragment = new ConversaFragment(conversa, drawer, fachada);
 //                Map<String, Object> map = new HashMap<>();
 //                map.put("fachada", fachada);
@@ -105,9 +107,11 @@ private GroupAdapter adapter;
 
     }
 
+    @SuppressLint("LongLogTag")
     public void addItemList(Contato contato){
         if (!(this.meuContato.getUId().equals(contato.getUId()))){
-            if (adapter.getItemCount()> 0){
+            Log.i("TesteVeficiar Quantidade no adapter",  "Procurando contato" + adapter.getItemCount());
+            if (adapter.getItemCount() >= 1){
                 for (int i = 0; i < adapter.getItemCount(); i++) {
                     ContatoItem contatoItem = (ContatoItem) adapter.getItem(i);
                     Contato contato1 = contatoItem.contato;

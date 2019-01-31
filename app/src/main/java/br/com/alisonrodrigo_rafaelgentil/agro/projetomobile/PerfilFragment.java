@@ -161,6 +161,7 @@ public class PerfilFragment extends Fragment implements IObserver, IComunicadorI
                 }
                 if (okButton.getText().toString().equals(MaskEditUtil.ATUALIZAR)){
                     atualizar();
+                    abilitarCampos(false);
                 }
 //                if (okButton.getText().toString().equals(MaskEditUtil.EDITAR)){
 //

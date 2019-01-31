@@ -14,11 +14,11 @@ public class Contato implements Serializable, ISubject {
     private String fotoFileURL;
     private String nome;
     private String UId;
-    private List<Mensagem> mensagens;
+
     private List<String> UIdchats;
     private List<IObserver> observers;
     public Contato() {
-        this.mensagens = new ArrayList<>();
+
         this.observers = new ArrayList<>();
         this.UIdchats = new ArrayList<>();
     }
@@ -42,14 +42,7 @@ public class Contato implements Serializable, ISubject {
         return nome;
     }
 
-    public List<Mensagem> getMensagens() {
-        return mensagens;
-    }
 
-    public void addMensagem(Mensagem mensagem){
-        this.mensagens.add(mensagem);
-        notifyObservers();
-    }
 
     public List<String> getUIdchats() {
         return UIdchats;
@@ -59,11 +52,11 @@ public class Contato implements Serializable, ISubject {
         this.UIdchats = UIdchats;
     }
 
-    public Map<String, Object> getMapMensagens(){
-        Map<String, Object> map = new HashMap<>();
-        map.put("" + getUId(), getMensagensMap());
-        return map;
-    }
+//    public Map<String, Object> getMapMensagens(){
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("" + getUId(), getMensagensMap());
+//        return map;
+//    }
 
     public Map<String, Object> getMapContato(){
         Map<String, Object> map = new HashMap<>();
@@ -74,13 +67,13 @@ public class Contato implements Serializable, ISubject {
 
         return map;
     }
-    private List<Map<String, Object>> getMensagensMap() {
-        List<Map<String, Object>> mensagens_maps = new ArrayList<>();
-        for (Mensagem mensagem:mensagens) {
-            mensagens_maps.add(mensagem.getMap());
-        }
-        return mensagens_maps;
-    }
+//    private List<Map<String, Object>> getMensagensMap() {
+//        List<Map<String, Object>> mensagens_maps = new ArrayList<>();
+//        for (Mensagem mensagem:mensagens) {
+//            mensagens_maps.add(mensagem.getMap());
+//        }
+//        return mensagens_maps;
+//    }
 
     public List<IObserver> getObservers() {
         return observers;

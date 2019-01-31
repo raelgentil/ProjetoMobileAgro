@@ -12,9 +12,11 @@ public class Conversa implements ISubject  {
     Contato contato;
     Contato meuContato;
     private String UId;
+    private List<Mensagem> mensagens;
     private List<IObserver> observers;
     public Conversa() {
         this.observers = new ArrayList<>();
+        this.mensagens = new ArrayList<>();
     }
 
 
@@ -41,6 +43,14 @@ public class Conversa implements ISubject  {
         return map;
     }
 
+    public List<Mensagem> getMensagens() {
+        return mensagens;
+    }
+
+    public void addMensagem(Mensagem mensagem){
+        this.mensagens.add(mensagem);
+        notifyObservers();
+    }
     public void setUId(String UId) {
         this.UId = UId;
     }

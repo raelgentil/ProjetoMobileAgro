@@ -1,6 +1,8 @@
 package br.com.alisonrodrigo_rafaelgentil.agro.model.fachada;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.Serializable;
@@ -11,12 +13,12 @@ import br.com.alisonrodrigo_rafaelgentil.agro.model.business.classes.PessoaBusin
 import br.com.alisonrodrigo_rafaelgentil.agro.model.business.interfaces.IContatoBusiness;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.business.interfaces.IConversaBusiness;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.business.interfaces.IPessoaBusiness;
+import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Chat;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Conversa;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Mensagem;
 import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Pessoa;
-import br.com.alisonrodrigo_rafaelgentil.agro.model.entidades.classes.Usuario;
+import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.ChatFragment;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.ContatoFragment;
-import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.LoginFragment;
 import br.com.alisonrodrigo_rafaelgentil.agro.projetomobile.PerfilFragment;
 
 public class Fachada implements IFachada, Serializable{
@@ -29,9 +31,11 @@ public class Fachada implements IFachada, Serializable{
     public Fachada() {
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference conexao = database.getReference();
         this.pessoaBusiness = new PessoaBusiness(auth, firestore);
         this.contatoBusiness = new ContatoBusiness(firestore);
-        this.conversaBusiness = new ConversaBusiness(auth, firestore);
+        this.conversaBusiness = new ConversaBusiness(auth, firestore, conexao);
 
     }
 
@@ -56,7 +60,22 @@ public class Fachada implements IFachada, Serializable{
     }
 
     @Override
+    public void pegarConversa(Conversa conversa) {
+        conversaBusiness.pegarConversa(conversa);
+    }
+
+    @Override
     public void salvarConersa(Conversa conversa, Mensagem mensagem) {
         this.conversaBusiness.salvarOuAtualizar(conversa, mensagem);
+    }
+
+    @Override
+    public void pegarConversas(ChatFragment chatFragment) {
+        this.conversaBusiness.pegarConversas(chatFragment);
+    }
+
+    @Override
+    public void listarConversas(Chat chat) {
+        conversaBusiness.listarConversas(chat);
     }
 }

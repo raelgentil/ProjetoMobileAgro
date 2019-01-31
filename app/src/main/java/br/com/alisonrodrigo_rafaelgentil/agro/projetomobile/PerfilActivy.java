@@ -54,7 +54,7 @@ public class PerfilActivy extends AppCompatActivity
     public PerfilActivy() {
 //        this.conversas = new ArrayList<>();
         fachada = new Fachada();
-        chatFragment = new ChatFragment();
+
     }
 
     @Override
@@ -89,6 +89,10 @@ public class PerfilActivy extends AppCompatActivity
         fotoImgViewHeader = (CircleImageView)headerView.findViewById(R.id.fotoImgView);
         Bundle args = getIntent().getBundleExtra("args");
         pessoa = (Pessoa) args.getSerializable("pessoa");
+        Map<String, Object> mapp = new HashMap<>();
+        mapp.put("pessoa", pessoa);
+        mapp.put("drawer_layout", drawer);
+        mapp.put("fachada", fachada);
 
         if (pessoa.getNome() != null){
             pessoa.addObserver(this);
@@ -185,10 +189,9 @@ public class PerfilActivy extends AppCompatActivity
             case R.id.nav_share:
                 break;
             case R.id.nav_chat:
+                chatFragment = new ChatFragment(drawer, fachada);
                 map = new HashMap<>();
                 map.put("pessoa", pessoa);
-                map.put("fachada", fachada);
-                map.put("drawer_layout", drawer);
                 chatFragment.responde(map);
                 fragmentTransaction.replace(R.id.layout_principal, chatFragment);
                 fragmentTransaction.commit ();
@@ -214,6 +217,7 @@ public class PerfilActivy extends AppCompatActivity
 
     @Override
     public void update(Object observado) {
+        pessoa = (Pessoa) observado;
         if (pessoa != null){
             nomeTViewHeader.setText(pessoa.getNome());
 

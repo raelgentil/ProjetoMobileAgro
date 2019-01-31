@@ -42,7 +42,7 @@ public class PessoaDAO implements IPessoaDAO {
         this.firestore = firestore;
     }
 
-    public boolean autenticar(final Pessoa pessoa){
+    public boolean autenticar(final Pessoa pessoa) {
 //        final IComunicadorInterface comunicadorInterface = (IComunicadorInterface) fragment.getContext();
 
             Log.i("TesteAutenticado", "Vou entrar no autenticar:   "  + pessoa.getUsuario().getEmail() + "    " + pessoa.getUsuario().getSenha());
@@ -65,7 +65,7 @@ public class PessoaDAO implements IPessoaDAO {
 //                            showProgress(false);
 //                            okButton.setEnabled(true);
 //                            cadastroTView.setEnabled(true);
-                            e.printStackTrace();
+                                e.printStackTrace();
                             if(e.getMessage().equals("The email address is badly formatted.")){
                                 mensagem += "O e-mail digitado é invalido, digite um e-mail valido";
                             }
@@ -78,6 +78,7 @@ public class PessoaDAO implements IPessoaDAO {
                             Map<String, Object> map = new HashMap<>();
                             map.put("show", true);
                             map.put("mensagem", mensagem);
+
 //                            fragment.responde(map);
                         }
                     });
@@ -246,6 +247,7 @@ public class PessoaDAO implements IPessoaDAO {
 //                        Toast.makeText(getContext(),"Usuário salvo com sucesso!", Toast.LENGTH_LONG).show();
                         map.put("mensagem", "Usuário salvo com sucesso!");
                         fragment.responde(map);
+                        pessoa.notifyObservers();
                     }
                 })
                .addOnFailureListener(new OnFailureListener() {
@@ -279,7 +281,6 @@ public class PessoaDAO implements IPessoaDAO {
 
     public void pegarDadosPessoa(final Pessoa pessoa) {
         Query querry1 = firestore.collection("pessoa").document(pessoa.getUsuario().getUId()).getParent();
-//        Query querry1 = firestore.collection("pessoa").document(pessoa.getUsuario().getUId()).collection("dados").whereEqualTo("UId", pessoa.getUsuario().getUId());
         querry1.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
